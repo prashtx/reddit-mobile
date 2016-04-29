@@ -134,7 +134,7 @@ const _listing = shape({
   promoted: bool,
   saved: bool.isRequired,
   selftext: string.isRequired,
-  selftext_html: string.isRequired,
+  selftext_html: string,
   sr_detail: shape({
     icon_img: string,
     key_color: string,
