@@ -197,8 +197,8 @@ export default class RelevantContent extends BaseComponent {
     if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
       const { topLinks } = relevant;
       let visited = [];
-      if (localStorageAvailable) {
-        visitedString = global.localStorage.getItem('visitedPosts');
+      if (localStorageAvailable()) {
+        const visitedString = localStorage.getItem('visitedPosts');
         if (visitedString) {
           visited = visitedString.split(',');
         }
@@ -217,6 +217,7 @@ export default class RelevantContent extends BaseComponent {
         if (predicate(link)) {
           post = link;
         }
+        i += 1;
       }
 
       if (!post) {
@@ -239,9 +240,9 @@ export default class RelevantContent extends BaseComponent {
       const noop = (e => e.preventDefault());
 
       return (
-        <div className='NextContent container' key='nextcontent-container'>
+        <div className='NextContent container bottom' key='nextcontent-container'>
           <article ref='rootNode' className='Post' key={ id }>
-            <div className='Post__header-wrapper' onClick={ onClick }>
+            <div className='NextContent__post-wrapper' onClick={ onClick }>
               <PostContent
                 post={ postWithFallback }
                 single={ false }
@@ -260,9 +261,9 @@ export default class RelevantContent extends BaseComponent {
                 showLinksInNewTab={ false }
               />
               <header className='PostHeader size-compact m-thumbnail-margin'>
-                <div className='PostHeader__post-descriptor-line-overflow'>
+                <div className='PostHeader__post-descriptor-line'>
                 <a
-                  className='PostHeader__post-title-line-blue'
+                  className='PostHeader__post-title-line'
                   href='#'
                   onClick={ noop }
                   target={ linkExternally ? '_blank' : null }
@@ -270,7 +271,7 @@ export default class RelevantContent extends BaseComponent {
                   { title }
                 </a></div>
                 <a
-                  className='PostHeader__post-title-line'
+                  className='PostHeader__post-descriptor-line'
                   href='#'
                   onClick={ noop }
                   target={ linkExternally ? '_blank' : null }
@@ -278,10 +279,14 @@ export default class RelevantContent extends BaseComponent {
                   { post.ups } upvotes in r/{ post.subreddit }
                 </a>
               </header>
+            </div>
+            <div className='NextContent__next-link'>
               <a
-                className='NextContent next-link'
+                href='#'
+                onClick={ noop }
               >
-                NEXT &gt;
+                NEXT
+                <span className='icon-nav-arrowforward icon-inline'></span>
               </a>
             </div>
           </article>

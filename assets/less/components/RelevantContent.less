@@ -148,3 +148,101 @@
 .RelevantContent .PostHeader__post-title-line {
   color: @grey-text;
 }
+
+@thumbnail-size: 50px;
+@nextcontent-height: @thumbnail-size + 2 * @grid-size;
+@nextcontent-link-width: 80px;
+.NextContent {
+  width: 100%;
+  height: @nextcontent-height;
+  cursor: pointer;
+
+  &.bottom {
+    position: fixed;
+    bottom: 0px;
+    padding: 0;
+    margin: 0;
+    .themeify({
+      border-top: @theme-border;
+      background-color: @theme-body-color;
+    });
+  }
+  padding: @grid-size;
+
+  &__post-wrapper {
+    position: relative;
+    display: inline-block;
+    width: calc(~"100% - "@nextcontent-link-width);
+  }
+
+  &__next-link {
+    right: 0;
+    position: absolute;
+    width: @nextcontent-link-width;
+    display: inline-block;
+    font-size: @font-size-base;
+    line-height: 1.5;
+    text-align: center;
+    text-transform: uppercase;
+    color: @blue;
+    // height: @thumbnail-size;
+    margin-top: (@nextcontent-height - (1.5 * @font-size-base)) / 2;
+    margin-bottom: (@nextcontent-height - (1.5 * @font-size-base)) / 2;
+    margin-right: @grid-size;
+    margin-left: @grid-size;
+    // XXX background: @blue;
+    // margin-top: 3*@grid-size;
+    // margin-bottom: 3*@grid-size;
+    // margin-left: @grid-size;
+    // margin-right: @grid-size;
+    // padding-top: @grid-size;
+    // padding-bottom: @grid-size;
+    a, a:hover, a:visited {
+      vertical-align: bottom;
+      text-decoration: none;
+      color: @blue;
+    }
+    .icon-inline {
+      &, &:hover, &:visited {
+        font-size: @font-size-base;
+        line-height: 1.5;
+        color: @blue;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .Post {
+    margin-bottom: 0;
+  }
+
+  .PostContent.size-compact {
+    position: absolute;
+    // XXX Move these to a variable
+    width: @thumbnail-size;
+    height: @thumbnail-size;
+    top: @grid-size;
+    left: @grid-size;
+    margin-bottom: 0;
+
+    .PostContent__image-link {
+      height: 50px;
+      width: 50px;
+    }
+  }
+
+  .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
+    @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
+    margin-left: @rendered-thumbnail-size;
+    min-height: @rendered-thumbnail-size;
+    margin-top: @grid-size;
+    margin-bottom: @grid-size;
+  }
+
+
+}
+
+
+.container.with-footer-nextcontent {
+  margin-bottom: @nextcontent-height + @grid-size;
+}

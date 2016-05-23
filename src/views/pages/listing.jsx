@@ -245,6 +245,10 @@ class ListingPage extends BasePage {
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
        this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM));
+    let footerClass = '';
+    if (this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM)) {
+      footerClass = 'with-footer-nextcontent';
+    }
 
     /*
       comments can be in one of three states:
@@ -399,7 +403,7 @@ class ListingPage extends BasePage {
             winWidth={ constants.POST_DEFAULT_WIDTH }
             toggleEdit={ this.toggleEdit }
           />
-          <div className='container'>
+          <div className={ `container ${footerClass}` }>
             <div className="listing-content__tools">
               <LinkTools
                 ctx={ ctx }
