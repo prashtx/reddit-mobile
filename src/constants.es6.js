@@ -59,6 +59,7 @@ export default {
     VARIANT_RELEVANCY_TOP: 'experimentRelevancyTop',
     VARIANT_RELEVANCY_ENGAGING: 'experimentRelevancyEngaging',
     VARIANT_RELEVANCY_RELATED: 'experimentRelevancyRelated',
+    VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
   },
 
   themes: {

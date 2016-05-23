@@ -243,7 +243,8 @@ class ListingPage extends BasePage {
       !expandComments &&
       (this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
-       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING));
+       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
+       this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM));
 
     /*
       comments can be in one of three states:

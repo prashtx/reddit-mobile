@@ -8,6 +8,7 @@ const {
   VARIANT_RELEVANCY_TOP,
   VARIANT_RELEVANCY_ENGAGING,
   VARIANT_RELEVANCY_RELATED,
+  VARIANT_NEXTCONTENT_BOTTOM,
 } = constants.flags;
 
 const config = {
@@ -40,6 +41,7 @@ const config = {
       }],
     },
   },
+  [VARIANT_NEXTCONTENT_BOTTOM]: true, // XXX
 };
 
 const flags = new Flags(config);

@@ -6,6 +6,7 @@ import filter from 'lodash/collection/filter';
 import constants from '../../../constants';
 import formatNumber from '../../../lib/formatNumber';
 import mobilify from '../../../lib/mobilify';
+import localStorageAvailable from '../../../lib/localStorageAvailable';
 
 import BaseComponent from '../BaseComponent';
 import PostContent from './PostContent';
@@ -19,6 +20,7 @@ const {
   VARIANT_RELEVANCY_TOP,
   VARIANT_RELEVANCY_ENGAGING,
   VARIANT_RELEVANCY_RELATED,
+  VARIANT_NEXTCONTENT_BOTTOM,
 } = constants.flags;
 
 export default class RelevantContent extends BaseComponent {
@@ -188,6 +190,101 @@ export default class RelevantContent extends BaseComponent {
           >
               See top 25 Posts
           </a>
+        </div>
+      );
+    }
+
+    if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
+      const { topLinks } = relevant;
+      let visited = [];
+      if (localStorageAvailable) {
+        visitedString = global.localStorage.getItem('visitedPosts');
+        if (visitedString) {
+          visited = visitedString.split(',');
+        }
+      }
+      const predicate = (link =>
+        !link.over_18 &&
+        link.id !== listingId &&
+        !link.stickied &&
+        (visited.indexOf(link.id) === -1));
+
+      // XXX rename some of these bindings
+      let post;
+      let i = 0;
+      while (!post && i < topLinks.length) {
+        const link = topLinks[i];
+        if (predicate(link)) {
+          post = link;
+        }
+      }
+
+      if (!post) {
+        return;
+      }
+
+      const { width } = this.props;
+      const linkExternally = post.disable_comments;
+      const url = cleanPostHREF(mobilify(linkExternally ? post.url : post.cleanPermalink));
+      const { id, title, name } = post;
+      // Make sure we always have an image to show
+      // Link to the comment thread instead of external content
+      const postWithFallback = {
+        preview: {},
+        ...post,
+        thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
+        cleanUrl: '#',
+      };
+      const onClick = (e => this.goToPost(e, url, name, i + 1));
+      const noop = (e => e.preventDefault());
+
+      return (
+        <div className='NextContent container' key='nextcontent-container'>
+          <article ref='rootNode' className='Post' key={ id }>
+            <div className='Post__header-wrapper' onClick={ onClick }>
+              <PostContent
+                post={ postWithFallback }
+                single={ false }
+                compact={ true }
+                expandedCompact={ false }
+                onTapExpand={ function () {} }
+                width={ width }
+                toggleShowNSFW={ false }
+                showNSFW={ false }
+                editing={ false }
+                toggleEditing={ false }
+                saveUpdatedText={ false }
+                forceHTTPS={ this.forceHTTPS }
+                isDomainExternal={ this.externalDomain }
+                renderMediaFullbleed={ true }
+                showLinksInNewTab={ false }
+              />
+              <header className='PostHeader size-compact m-thumbnail-margin'>
+                <div className='PostHeader__post-descriptor-line-overflow'>
+                <a
+                  className='PostHeader__post-title-line-blue'
+                  href='#'
+                  onClick={ noop }
+                  target={ linkExternally ? '_blank' : null }
+                >
+                  { title }
+                </a></div>
+                <a
+                  className='PostHeader__post-title-line'
+                  href='#'
+                  onClick={ noop }
+                  target={ linkExternally ? '_blank' : null }
+                >
+                  { post.ups } upvotes in r/{ post.subreddit }
+                </a>
+              </header>
+              <a
+                className='NextContent next-link'
+              >
+                NEXT &gt;
+              </a>
+            </div>
+          </article>
         </div>
       );
     }
