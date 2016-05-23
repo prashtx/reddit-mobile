@@ -200,14 +200,16 @@
     a, a:hover, a:visited {
       vertical-align: bottom;
       text-decoration: none;
-      color: @blue;
-    }
-    .icon-inline {
-      &, &:hover, &:visited {
+      .themeify({
+        color: @blue;
+      });
+      .icon-inline {
         font-size: @font-size-base;
         line-height: 1.5;
-        color: @blue;
-        text-decoration: none;
+        .themeify({
+          color: @blue;
+          text-decoration: none;
+        });
       }
     }
   }
