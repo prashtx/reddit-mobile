@@ -243,12 +243,22 @@ class ListingPage extends BasePage {
       !expandComments &&
       (this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
-       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
-       this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM));
+       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING));
+
     let footerClass = '';
     if (this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM)) {
       footerClass = 'with-footer-nextcontent';
     }
+
+    const relevantBottom =
+      (this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
+       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
+       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
+       this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM));
+
+    const relevantMiddle =
+      this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_MIDDLE);
+
 
     /*
       comments can be in one of three states:
@@ -403,6 +413,7 @@ class ListingPage extends BasePage {
             winWidth={ constants.POST_DEFAULT_WIDTH }
             toggleEdit={ this.toggleEdit }
           />
+          { relevantMiddle ? relevantContent : null }
           <div className={ `container ${footerClass}` }>
             <div className="listing-content__tools">
               <LinkTools
@@ -421,7 +432,7 @@ class ListingPage extends BasePage {
             { singleComment }
             { commentsList }
           </div>
-          { relevantContent }
+          { relevantBottom ? relevantContent : null }
         </div>
       </div>
     );

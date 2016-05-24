@@ -4,6 +4,7 @@ import React from 'react';
 import querystring from 'querystring';
 
 import merge from 'lodash/object/merge';
+import uniq from 'lodash/array/uniq';
 import url from 'url';
 
 // components
@@ -438,10 +439,10 @@ function routes(app) {
       } else {
         visited = [];
       }
-      global.localStorage.setItem(
-        'visitedPosts',
-        ([ctx.params.listingId].concat(visited.slice(0,9))).join(',')
-      );
+      visited = uniq([ctx.params.listingId].concat(visited))
+        .slice(0,constants.VISITED_POST_COUNT)
+        .join(',');
+      global.localStorage.setItem('visitedPosts', visited);
     }
 
     const commentsOpts = buildAPIOptions(ctx, {
@@ -477,7 +478,8 @@ function routes(app) {
         },
       });
       if (feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
-          feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM)) {
+          feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM) ||
+          feature.enabled(constants.flags.VARIANT_NEXTCONTENT_MIDDLE)) {
         const linkOpts = buildAPIOptions(ctx, {
           query: {
             subredditName: props.subredditName,

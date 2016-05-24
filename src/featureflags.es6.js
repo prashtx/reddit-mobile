@@ -9,6 +9,7 @@ const {
   VARIANT_RELEVANCY_ENGAGING,
   VARIANT_RELEVANCY_RELATED,
   VARIANT_NEXTCONTENT_BOTTOM,
+  VARIANT_NEXTCONTENT_MIDDLE,
 } = constants.flags;
 
 const config = {
@@ -41,7 +42,10 @@ const config = {
       }],
     },
   },
-  [VARIANT_NEXTCONTENT_BOTTOM]: true, // XXX
+  [VARIANT_NEXTCONTENT_BOTTOM]: {
+    url: 'experimentnextcontentbottom',
+  }, // XXX
+  [VARIANT_NEXTCONTENT_MIDDLE]: true, // XXX
 };
 
 const flags = new Flags(config);

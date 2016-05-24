@@ -14,13 +14,15 @@ import { cleanPostHREF } from './postUtils';
 
 const T = React.PropTypes;
 
-const NUM_LINKS = 3;
+const NUM_TOP_lINKS = 3;
+const NUM_NEXT_LINKS = 5;
 
 const {
   VARIANT_RELEVANCY_TOP,
   VARIANT_RELEVANCY_ENGAGING,
   VARIANT_RELEVANCY_RELATED,
   VARIANT_NEXTCONTENT_BOTTOM,
+  VARIANT_NEXTCONTENT_MIDDLE,
 } = constants.flags;
 
 export default class RelevantContent extends BaseComponent {
@@ -40,6 +42,7 @@ export default class RelevantContent extends BaseComponent {
     super(props);
 
     this.renderPostList = this.renderPostList.bind(this);
+    this.renderNextPostList = this.renderNextPostList.bind(this);
     this.goToSubreddit = this.goToSubreddit.bind(this);
     this.goToPost = this.goToPost.bind(this);
   }
@@ -70,6 +73,7 @@ export default class RelevantContent extends BaseComponent {
     e.preventDefault();
     const { app, isSelfText, loid, loidcreated } = this.props;
     // Send event
+    // XXX change event type and experiment name
     app.emit('click:experiment', {
       eventType: 'cs.relevant_posts_mweb_click',
       loid,
@@ -149,6 +153,69 @@ export default class RelevantContent extends BaseComponent {
     });
   }
 
+  renderNextPostList(posts) {
+    const { width } = this.props;
+    const noop = (e => e.preventDefault());
+
+    return posts.map((post, i) => {
+      const linkExternally = post.disable_comments;
+      const url = cleanPostHREF(mobilify(linkExternally ? post.url : post.cleanPermalink));
+      const { id, title, name } = post;
+      // Make sure we always have an image to show
+      // Link to the comment thread instead of external content
+      const postWithFallback = {
+        preview: {},
+        ...post,
+        thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
+        cleanUrl: '#',
+      };
+      const onClick = (e => this.goToPost(e, url, name, i + 1));
+
+      return (
+        <article ref='rootNode' className='Post' key={ id }>
+          <div className='NextContent__post-wrapper' onClick={ onClick }>
+            <PostContent
+              post={ postWithFallback }
+              single={ false }
+              compact={ true }
+              expandedCompact={ false }
+              onTapExpand={ function () {} }
+              width={ width }
+              toggleShowNSFW={ false }
+              showNSFW={ false }
+              editing={ false }
+              toggleEditing={ false }
+              saveUpdatedText={ false }
+              forceHTTPS={ this.forceHTTPS }
+              isDomainExternal={ this.externalDomain }
+              renderMediaFullbleed={ true }
+              showLinksInNewTab={ false }
+            />
+            <header className='PostHeader size-compact m-thumbnail-margin'>
+              <div className='PostHeader__post-descriptor-line'>
+              <a
+                className='PostHeader__post-title-line'
+                href='#'
+                onClick={ noop }
+                target={ linkExternally ? '_blank' : null }
+              >
+                { title }
+              </a></div>
+              <a
+                className='PostHeader__post-descriptor-line'
+                href='#'
+                onClick={ noop }
+                target={ linkExternally ? '_blank' : null }
+              >
+                { post.ups } upvotes in r/{ post.subreddit }
+              </a>
+            </header>
+          </div>
+        </article>
+      );
+    });
+  }
+
   render() {
     const {
       feature,
@@ -165,14 +232,14 @@ export default class RelevantContent extends BaseComponent {
           !link.over_18 &&
           link.id !== listingId &&
           !link.stickied);
-      const links = take(filter(topLinks, predicate), NUM_LINKS);
+      const links = take(filter(topLinks, predicate), NUM_TOP_lINKS);
       const postList = this.renderPostList(links);
       const onActionClick = (e => this.goToSubreddit(e, {
         url: subreddit.url,
         id: subreddit.id,
         name: subreddit.title,
         linkName: 'top 25 posts',
-        linkIndex: NUM_LINKS + 1,
+        linkIndex: NUM_TOP_lINKS + 1,
       }));
       return (
         <div className='RelevantContent container' key='relevant-container'>
@@ -194,27 +261,27 @@ export default class RelevantContent extends BaseComponent {
       );
     }
 
+    let visited = [];
+    if (localStorageAvailable()) {
+      const visitedString = localStorage.getItem('visitedPosts');
+      if (visitedString) {
+        visited = visitedString.split(',');
+      }
+    }
+    const safeAndNew = (link =>
+      !link.over_18 &&
+      link.id !== listingId &&
+      !link.stickied &&
+      (visited.indexOf(link.id) === -1));
+
     if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
       const { topLinks } = relevant;
-      let visited = [];
-      if (localStorageAvailable()) {
-        const visitedString = localStorage.getItem('visitedPosts');
-        if (visitedString) {
-          visited = visitedString.split(',');
-        }
-      }
-      const predicate = (link =>
-        !link.over_18 &&
-        link.id !== listingId &&
-        !link.stickied &&
-        (visited.indexOf(link.id) === -1));
-
       // XXX rename some of these bindings
       let post;
       let i = 0;
       while (!post && i < topLinks.length) {
         const link = topLinks[i];
-        if (predicate(link)) {
+        if (safeAndNew(link)) {
           post = link;
         }
         i += 1;
@@ -290,6 +357,17 @@ export default class RelevantContent extends BaseComponent {
               </a>
             </div>
           </article>
+        </div>
+      );
+    }
+
+    if (feature.enabled(VARIANT_NEXTCONTENT_MIDDLE)) {
+      const topLinks = relevant.topLinks;
+      const links = take(filter(topLinks, safeAndNew), NUM_NEXT_LINKS);
+      const postList = this.renderNextPostList(links);
+      return (
+        <div className='NextContent container middle' key='nextcontent-container'>
+          { postList }
         </div>
       );
     }
