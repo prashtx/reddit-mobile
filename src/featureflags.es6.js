@@ -44,8 +44,12 @@ const config = {
   },
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
+    subreddit: 'pics',
   }, // XXX
-  [VARIANT_NEXTCONTENT_MIDDLE]: true, // XXX
+  [VARIANT_NEXTCONTENT_MIDDLE]: {
+    url: 'experimentnextcontentmiddle',
+    subreddit: 'gaming',
+  }, // XXX
 };
 
 const flags = new Flags(config);

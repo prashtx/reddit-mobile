@@ -3,6 +3,8 @@ import React from 'react';
 import take from 'lodash/array/take';
 import filter from 'lodash/collection/filter';
 
+import { Swipeable } from 'react-touch';
+
 import constants from '../../../constants';
 import formatNumber from '../../../lib/formatNumber';
 import mobilify from '../../../lib/mobilify';
@@ -25,6 +27,10 @@ const {
   VARIANT_NEXTCONTENT_MIDDLE,
 } = constants.flags;
 
+function mod(m, n) {
+  return ((m % n) + n) % n;
+}
+
 export default class RelevantContent extends BaseComponent {
   static propTypes = {
     feature: T.object.isRequired,
@@ -41,8 +47,15 @@ export default class RelevantContent extends BaseComponent {
   constructor(props) {
     super(props);
 
+    if (props.feature.enabled(VARIANT_NEXTCONTENT_MIDDLE)) {
+      this.state = {
+        postNum: 0,
+        ...this.state,
+      };
+    }
+
     this.renderPostList = this.renderPostList.bind(this);
-    this.renderNextPostList = this.renderNextPostList.bind(this);
+    this.renderCarouselPost = this.renderCarouselPost.bind(this);
     this.goToSubreddit = this.goToSubreddit.bind(this);
     this.goToPost = this.goToPost.bind(this);
   }
@@ -153,67 +166,115 @@ export default class RelevantContent extends BaseComponent {
     });
   }
 
-  renderNextPostList(posts) {
+  renderCarouselPost(post, i, offset) {
     const { width } = this.props;
     const noop = (e => e.preventDefault());
 
-    return posts.map((post, i) => {
-      const linkExternally = post.disable_comments;
-      const url = cleanPostHREF(mobilify(linkExternally ? post.url : post.cleanPermalink));
-      const { id, title, name } = post;
-      // Make sure we always have an image to show
-      // Link to the comment thread instead of external content
-      const postWithFallback = {
-        preview: {},
-        ...post,
-        thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
-        cleanUrl: '#',
-      };
-      const onClick = (e => this.goToPost(e, url, name, i + 1));
+    const linkExternally = post.disable_comments;
+    const url = cleanPostHREF(mobilify(linkExternally ? post.url : post.cleanPermalink));
+    const { id, title, name } = post;
+    // Make sure we always have an image to show
+    // Link to the comment thread instead of external content
+    const postWithFallback = {
+      preview: {},
+      ...post,
+      thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
+      cleanUrl: '#',
+    };
+    const onClick = (e => this.goToPost(e, url, name, i + 1));
+    let articleClass;
+    if (offset < 0) {
+      articleClass = 'NextContent__carousel-prev';
+    } else if (offset > 0) {
+      articleClass = 'NextContent__carousel-next';
+    } else {
+      articleClass = 'NextContent__carousel-primary';
+    }
 
-      return (
-        <article ref='rootNode' className='Post' key={ id }>
-          <div className='NextContent__post-wrapper' onClick={ onClick }>
-            <PostContent
-              post={ postWithFallback }
-              single={ false }
-              compact={ true }
-              expandedCompact={ false }
-              onTapExpand={ function () {} }
-              width={ width }
-              toggleShowNSFW={ false }
-              showNSFW={ false }
-              editing={ false }
-              toggleEditing={ false }
-              saveUpdatedText={ false }
-              forceHTTPS={ this.forceHTTPS }
-              isDomainExternal={ this.externalDomain }
-              renderMediaFullbleed={ true }
-              showLinksInNewTab={ false }
-            />
-            <header className='PostHeader size-compact m-thumbnail-margin'>
-              <div className='PostHeader__post-descriptor-line'>
-              <a
-                className='PostHeader__post-title-line'
-                href='#'
-                onClick={ noop }
-                target={ linkExternally ? '_blank' : null }
-              >
-                { title }
-              </a></div>
-              <a
-                className='PostHeader__post-descriptor-line'
-                href='#'
-                onClick={ noop }
-                target={ linkExternally ? '_blank' : null }
-              >
-                { post.ups } upvotes in r/{ post.subreddit }
-              </a>
-            </header>
-          </div>
-        </article>
-      );
-    });
+        // style={ { transform: `translate3d(${dx}px, 0px, 0)`} }
+    return (
+      <article
+        ref='rootNode'
+        className={ `Post ${articleClass}` }
+        key={ `${id}-${offset}` }
+      >
+        <div className='NextContent__post-wrapper' onClick={ onClick }>
+          <PostContent
+            post={ postWithFallback }
+            single={ false }
+            compact={ true }
+            expandedCompact={ false }
+            onTapExpand={ function () {} }
+            width={ width }
+            toggleShowNSFW={ false }
+            showNSFW={ false }
+            editing={ false }
+            toggleEditing={ false }
+            saveUpdatedText={ false }
+            forceHTTPS={ this.forceHTTPS }
+            isDomainExternal={ this.externalDomain }
+            renderMediaFullbleed={ true }
+            showLinksInNewTab={ false }
+          />
+          <header className='PostHeader size-compact m-thumbnail-margin'>
+            <div className='PostHeader__post-descriptor-line'>
+            <a
+              className='PostHeader__post-title-line'
+              href='#'
+              onClick={ noop }
+              target={ linkExternally ? '_blank' : null }
+            >
+              { title }
+            </a></div>
+            <a
+              className='PostHeader__post-descriptor-line'
+              href='#'
+              onClick={ noop }
+              target={ linkExternally ? '_blank' : null }
+            >
+              { post.ups } upvotes in r/{ post.subreddit }
+            </a>
+          </header>
+        </div>
+      </article>
+    );
+  }
+
+  renderNextPostCarousel(posts) {
+    const { postNum } = this.state;
+
+    const postCount = Math.min(posts.length, NUM_NEXT_LINKS);
+
+    const prevNum = mod(postNum - 1, postCount);
+    const nextNum = mod(postNum + 1, postCount);
+
+    const prevPost = this.renderCarouselPost(posts[prevNum], 0, -1);
+    const primaryPost = this.renderCarouselPost(posts[postNum], 0, 0);
+    const nextPost = this.renderCarouselPost(posts[nextNum], 0, 1);
+
+    const onSwipeLeft = () => {
+      console.log('swipe!'); // XXX
+      this.setState({
+        postNum: mod(postNum + 1, postCount),
+      });
+    };
+
+    const onSwipeRight = () => {
+      console.log('swipe!'); // XXX
+      this.setState({
+        postNum: mod(postNum - 1, postCount),
+      });
+    };
+
+    return (
+      <Swipeable onSwipeLeft={ onSwipeLeft } onSwipeRight={ onSwipeRight }>
+        <div className='NextContent__dragContainer'>
+          { /*prevPost*/ }
+          { primaryPost }
+          { /*nextPost*/ }
+        </div>
+      </Swipeable>
+    );
   }
 
   render() {
@@ -362,11 +423,35 @@ export default class RelevantContent extends BaseComponent {
     }
 
     if (feature.enabled(VARIANT_NEXTCONTENT_MIDDLE)) {
+      // const { postNum } = this.state;
+
       const topLinks = relevant.topLinks;
       const links = take(filter(topLinks, safeAndNew), NUM_NEXT_LINKS);
-      const postList = this.renderNextPostList(links);
+      // const postCount = Math.min(links.length, NUM_NEXT_LINKS);
+      const postList = this.renderNextPostCarousel(links);
+
+      // const onSwipeLeft = () => {
+      //   this.setState({
+      //     postNum: (postNum + 1) % postCount,
+      //   });
+      //   console.log('swipe!'); // XXX
+      // };
+
+      // const onSwipeRight = () => {
+      //   this.setState({
+      //     postNum: (postNum - 1) % postCount,
+      //   });
+      //   console.log('swipe!'); // XXX
+      // };
+
       return (
-        <div className='NextContent container middle' key='nextcontent-container'>
+        <div
+          className='NextContent container middle'
+          key='nextcontent-container'
+        >
+          <div className='NextContent__heading'>
+            Top Posts from r/Gaming {/* XXX */}
+          </div>
           { postList }
         </div>
       );
