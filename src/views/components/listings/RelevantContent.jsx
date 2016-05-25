@@ -271,7 +271,7 @@ export default class RelevantContent extends BaseComponent {
         <div className='NextContent__dragContainer'>
           { /*prevPost*/ }
           { primaryPost }
-          { /*nextPost*/ }
+          { nextPost }
         </div>
       </Swipeable>
     );

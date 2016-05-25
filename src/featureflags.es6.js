@@ -44,11 +44,11 @@ const config = {
   },
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
-    subreddit: 'pics',
+    subreddit: 'images',
   }, // XXX
   [VARIANT_NEXTCONTENT_MIDDLE]: {
     url: 'experimentnextcontentmiddle',
-    subreddit: 'gaming',
+    subreddit: 'pics',
   }, // XXX
 };
 
