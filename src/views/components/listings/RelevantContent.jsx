@@ -268,7 +268,7 @@ export default class RelevantContent extends BaseComponent {
 
     return (
       <Swipeable onSwipeLeft={ onSwipeLeft } onSwipeRight={ onSwipeRight }>
-        <div className='NextContent__dragContainer'>
+        <div className='NextContent__drag-container'>
           { /*prevPost*/ }
           { primaryPost }
           { nextPost }
