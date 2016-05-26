@@ -172,6 +172,7 @@
   &.middle {
     height: @thumbnail-size + 2 * @grid-size + 50px; // XXX
     padding: 0 0 @grid-size 0;
+    overflow: hidden;
     .themeify({
     },
     @inDayMode: {
@@ -181,13 +182,17 @@
       background-color: @black;
     });
 
-    .PostHeader {
-      &__post-title-line {
+    .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
+      .PostHeader__post-title-line {
         height: 44px; // XXX base this on the relevant variables/values
         white-space: normal;
+        padding-top: @grid-size / 2;
+      }
+      .PostHeader__post-descriptor-line {
+        display: block;
+        padding-right: 0;
       }
     }
-
   }
   &__drag-container {
     position: relative;
@@ -209,7 +214,12 @@
     // width: @nextcontent-link-width + @thumbnail-size;
     width: calc(~"100% - 100px");
     position: absolute;
-
+    top: 0;
+    left: calc(~"130px - 100%"); // XXX
+    .PostHeader.m-thumbnail-margin {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
   &.middle article&__carousel-primary {
     // width: @nextcontent-link-width + @thumbnail-size;
@@ -223,9 +233,16 @@
     width: calc(~"100% - 100px");
     position: absolute;
     top: 0;
-    // left: calc(~"100% - 50px"); // XXX
-    left: 0;
-    // XXX display: inline-block;
+    left: 390px;
+    .PostHeader.m-thumbnail-margin {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    // position: relative;
+    // top: -74px;
+    // // left: calc(~"100% - 50px"); // XXX
+    // left: 390px; // XXX
+    // // XXX display: inline-block;
   }
 
   padding: @grid-size;
