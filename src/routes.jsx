@@ -479,6 +479,7 @@ function routes(app) {
       });
       if (feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
           feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM) ||
+          feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BANNER) ||
           feature.enabled(constants.flags.VARIANT_NEXTCONTENT_MIDDLE)) {
         const linkOpts = buildAPIOptions(ctx, {
           query: {

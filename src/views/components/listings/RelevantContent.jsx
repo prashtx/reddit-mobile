@@ -4,6 +4,7 @@ import take from 'lodash/array/take';
 import filter from 'lodash/collection/filter';
 
 import { Swipeable } from 'react-touch';
+import { Motion, spring } from 'react-motion';
 
 import constants from '../../../constants';
 import formatNumber from '../../../lib/formatNumber';
@@ -25,6 +26,7 @@ const {
   VARIANT_RELEVANCY_RELATED,
   VARIANT_NEXTCONTENT_BOTTOM,
   VARIANT_NEXTCONTENT_MIDDLE,
+  VARIANT_NEXTCONTENT_BANNER,
 } = constants.flags;
 
 function mod(m, n) {
@@ -53,12 +55,61 @@ export default class RelevantContent extends BaseComponent {
         ...this.state,
       };
     }
+    if (props.feature.enabled(VARIANT_NEXTCONTENT_BANNER)) {
+      this.state = {
+        displayBanner: false,
+        ...this.state,
+      };
+    }
 
     this.renderPostList = this.renderPostList.bind(this);
     this.renderCarouselPost = this.renderCarouselPost.bind(this);
     this.goToSubreddit = this.goToSubreddit.bind(this);
     this.goToPost = this.goToPost.bind(this);
+    this.maybeShowBanner = this.maybeShowBanner.bind(this);
   }
+
+  componentDidMount() {
+    this.addListeners();
+  }
+
+  componentWillUnmount() {
+    this.removeListeners();
+  }
+
+  addListeners() {
+    if (!this.hasListeners) {
+      this.hasListeners = true;
+      if (this.props.feature.enabled(VARIANT_NEXTCONTENT_BANNER)) {
+        if (window) {
+          this.scrollY = window.scrollY;
+          this.props.app.on(constants.SCROLL, this.maybeShowBanner);
+        }
+      }
+    }
+  }
+
+  removeListeners() {
+    if (this.hasListeners) {
+      this.hasListeners = false;
+      if (this.props.feature.enabled(VARIANT_NEXTCONTENT_BANNER)) {
+        this.props.app.off(constants.SCROLL, this.maybeShowBanner);
+      }
+    }
+  }
+
+  maybeShowBanner() {
+    if (window && window.scrollY > this.scrollY) {
+      this.props.app.off(constants.SCROLL, this.maybeShowBanner);
+      window.requestAnimationFrame(() => {
+        this.setState({
+          displayBanner: true,
+        });
+      });
+    }
+    // XXX
+  }
+
 
   goToSubreddit(e, { url, id, name, linkName, linkIndex }) {
     e.preventDefault();
@@ -335,7 +386,14 @@ export default class RelevantContent extends BaseComponent {
       !link.stickied &&
       (visited.indexOf(link.id) === -1));
 
-    if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
+    if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM) ||
+        feature.enabled(VARIANT_NEXTCONTENT_BANNER)) {
+      const { displayBanner } = this.state;
+
+      // if (feature.enabled(VARIANT_NEXTCONTENT_BANNER) && !displayBanner) {
+      //   return null;
+      // }
+
       const { topLinks } = relevant;
       // XXX rename some of these bindings
       let post;
@@ -367,10 +425,36 @@ export default class RelevantContent extends BaseComponent {
       const onClick = (e => this.goToPost(e, url, name, i + 1));
       const noop = (e => e.preventDefault());
 
-      return (
-        <div className='NextContent container bottom' key='nextcontent-container'>
+      let variant = 'banner';
+      let descriptor = null;
+      let actionText = 'MORE';
+      if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
+        variant = 'bottom';
+        descriptor = (
+          <a
+            className='PostHeader__post-descriptor-line'
+            href='#'
+            onClick={ noop }
+            target={ linkExternally ? '_blank' : null }
+          >
+            { post.ups } upvotes in r/{ post.subreddit }
+          </a>
+        );
+        actionText = 'NEXT';
+      }
+
+      const nextContent = y => (
+        <div
+          className={ `NextContent container ${variant}` }
+          key='nextcontent-container'
+          onClick={ onClick }
+          style={ {
+            WebkitTransform: `translate3d(0, ${y}px, 0)`,
+            transform: `translate3d(0, ${y}px, 0)`
+          } }
+        >
           <article ref='rootNode' className='Post' key={ id }>
-            <div className='NextContent__post-wrapper' onClick={ onClick }>
+            <div className='NextContent__post-wrapper'>
               <PostContent
                 post={ postWithFallback }
                 single={ false }
@@ -398,14 +482,7 @@ export default class RelevantContent extends BaseComponent {
                 >
                   { title }
                 </a></div>
-                <a
-                  className='PostHeader__post-descriptor-line'
-                  href='#'
-                  onClick={ noop }
-                  target={ linkExternally ? '_blank' : null }
-                >
-                  { post.ups } upvotes in r/{ post.subreddit }
-                </a>
+                { descriptor }
               </header>
             </div>
             <div className='NextContent__next-link'>
@@ -413,12 +490,23 @@ export default class RelevantContent extends BaseComponent {
                 href='#'
                 onClick={ noop }
               >
-                NEXT
+                { actionText }
                 <span className='icon-nav-arrowforward icon-inline'></span>
               </a>
             </div>
           </article>
         </div>
+      );
+
+      if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
+        return nextContent(0);
+      }
+      return (
+        <Motion style={ { y: spring(this.state.displayBanner ? 0 : 200) } }>
+          { ({ y }) =>
+            nextContent(y)
+          }
+        </Motion>
       );
     }
 

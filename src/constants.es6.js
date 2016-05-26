@@ -63,6 +63,7 @@ export default {
     VARIANT_RELEVANCY_RELATED: 'experimentRelevancyRelated',
     VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
     VARIANT_NEXTCONTENT_MIDDLE: 'experimentNextContentMiddle',
+    VARIANT_NEXTCONTENT_BANNER: 'experimentNextContentBanner',
   },
 
   themes: {

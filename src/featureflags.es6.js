@@ -10,6 +10,7 @@ const {
   VARIANT_RELEVANCY_RELATED,
   VARIANT_NEXTCONTENT_BOTTOM,
   VARIANT_NEXTCONTENT_MIDDLE,
+  VARIANT_NEXTCONTENT_BANNER,
 } = constants.flags;
 
 const config = {
@@ -49,6 +50,10 @@ const config = {
   [VARIANT_NEXTCONTENT_MIDDLE]: {
     url: 'experimentnextcontentmiddle',
     subreddit: 'pics',
+  }, // XXX
+  [VARIANT_NEXTCONTENT_BANNER]: {
+    url: 'experimentnextcontentbanner',
+    subreddit: 'pic',
   }, // XXX
 };
 

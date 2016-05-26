@@ -246,7 +246,8 @@ class ListingPage extends BasePage {
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING));
 
     let footerClass = '';
-    if (this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM)) {
+    if (this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM) ||
+        this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BANNER)) {
       footerClass = 'with-footer-nextcontent';
     }
 
@@ -254,6 +255,7 @@ class ListingPage extends BasePage {
       (this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
+       this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BANNER) ||
        this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM));
 
     const relevantMiddle =
