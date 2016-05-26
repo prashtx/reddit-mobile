@@ -11,6 +11,8 @@ import App from 'app';
 import reducers from 'app/reducers';
 import Session from 'app/models/Session';
 
+import middleware from 'app/middleware';
+
 const client = Client({
   routes,
   reducers,
@@ -36,6 +38,7 @@ const client = Client({
   },
   appComponent: <App/>,
   debug: true,
+  reduxMiddleware: middleware,
 })();
 
 client.dispatch(actions.activateClient());
