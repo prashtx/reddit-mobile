@@ -15,17 +15,16 @@ const actionEventMap = {
   [search.FETCHING_SEARCH_REQUEST]: searchEvent.search,
   [login.LOGGED_IN]: loginEvent.login,
   //[register.REGISTERED]: registerEvent.register,
-  [comment.REPLY]: commentEvent.reply,
+  [comment.REPLIED]: commentEvent.reply,
   // submit post
 };
 
 export default store => next => action => {
   const result = next(action);
-
   const trackingAction = actionEventMap[action.type];
 
   if (trackingAction) {
-    store.dispatch(trackingAction());
+    store.dispatch(trackingAction(action));
   }
 
   return result;
