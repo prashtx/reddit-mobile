@@ -19,6 +19,7 @@ import dispatchSession from 'server/session/dispatchSession';
 import { dispatchInitialCompact } from 'server/initialState/dispatchInitialCompact';
 import { dispatchInitialLoid } from 'server/initialState/dispatchInitialLoid';
 import { dispatchInitialTheme } from 'server/initialState/dispatchInitialTheme';
+import { dispatchInitialMeta } from 'server/initialState/dispatchInitialMeta';
 import metaRoutes from 'server/meta';
 
 import dispatchInitialCollapsedComments from
@@ -46,6 +47,7 @@ export function startServer() {
     template: main,
     reducers: allReducers,
     dispatchBeforeNavigation: async (ctx, dispatch/*, getState, utils*/) => {
+      dispatchInitialMeta(ctx, dispatch);
       dispatchInitialShell(ctx, dispatch);
       dispatchInitialLoid(ctx, dispatch);
       await dispatchSession(ctx, dispatch, ConfigedAPIOptions);

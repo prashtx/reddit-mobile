@@ -71,3 +71,11 @@ export function getThingFromStateById (state, id) {
 
   return thing;
 }
+
+export async function waitForValidSession(state, waitForState, cb) {
+  if (state.session.isValid) {
+    return await waitForState(state => state.user.name && state.accounts[state.user.name], cb);
+  } else {
+    cb(state);
+  }
+}

@@ -11,7 +11,7 @@ function focusInput(x) {
 
 export default class SearchBar extends React.Component {
   static propTypes = {
-//    onClear: T.func.isRequired, // TODO: uncomment this when we have tracking?
+    onClear: T.func.isRequired,
     subreddit: T.string,
     initialValue: T.string,
     placeholder: T.string,
@@ -36,7 +36,7 @@ export default class SearchBar extends React.Component {
   handleResetInput() {
     this.refs.input.value = '';
     focusInput(this.refs.input);
-    // this.props.onClear(); // TODO: wire-up tracking
+    this.props.onClear();
   }
 
   render() {
