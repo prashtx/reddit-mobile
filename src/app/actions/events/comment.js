@@ -10,7 +10,6 @@ import {
 export function buildCommentData(state, comment) {
   const post = getCurrentPostFromState(state);
   const subreddit = getCurrentSubredditFromState(state);
-  const user = getCurrentUserFromState(state);
 
   const parent = getThingFromStateById(state, comment.parentId);
 
@@ -22,8 +21,6 @@ export function buildCommentData(state, comment) {
     post_id: convertId(post.name),
     post_fullname: post.name,
     post_created_ts: post.createdUTC,
-    user_name: user.name,
-    user_id: user.id,
     comment_id: convertId(comment.name),
     comment_fullname: comment.name,
     comment_body: comment.body,
