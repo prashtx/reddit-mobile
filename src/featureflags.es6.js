@@ -46,14 +46,26 @@ const config = {
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
     subreddit: 'images',
+    and: [{
+      variant: 'nextcontent_mweb:bottom',
+      loggedin: false,
+    }],
   }, // XXX
   [VARIANT_NEXTCONTENT_MIDDLE]: {
     url: 'experimentnextcontentmiddle',
     subreddit: 'pics',
+    and: [{
+      variant: 'nextcontent_mweb:middle',
+      loggedin: false,
+    }],
   }, // XXX
   [VARIANT_NEXTCONTENT_BANNER]: {
     url: 'experimentnextcontentbanner',
     subreddit: 'pic',
+    and: [{
+      variant: 'nextcontent_mweb:banner',
+      loggedin: false,
+    }],
   }, // XXX
 };
 

@@ -107,7 +107,6 @@ export default class RelevantContent extends BaseComponent {
         });
       });
     }
-    // XXX
   }
 
 
