@@ -1,45 +1,46 @@
-import { getBasePayload, convertId } from './utils';
+import {
+  getBasePayload,
+  convertId,
+  getCurrentSubredditFromState,
+  getCurrentPostFromState,
+  getCurrentUserFromState,
+  getThingFromStateById,
+} from './utils';
 
-export function buildCommentData(state) {
-  /*
-  const {
-    subreddit,
-    subreddit_id,
-    author,
-    name,
-    body,
-    link_id,
-    parent_id,
-  } = state;
+export function buildCommentData(state, comment) {
+  const post = getCurrentPostFromState(state);
+  const subreddit = getCurrentSubredditFromState(state);
+  const user = getCurrentUserFromState(state);
+
+  const parent = getThingFromStateById(state, comment.parentId);
 
   const payload = {
     ...getBasePayload(state),
-    user_name: author,
-    user_id: convertId(state.user.id),
-    sr_name: subreddit,
-    sr_id: convertId(subreddit_id),
-    comment_id: convertId(name),
-    comment_fullname: name,
-    comment_body: body,
-    parent_id: convertId(parent_id),
-    parent_fullname: parent_id,
-    parent_created_ts: state.parentCreated,
-    post_id: convertId(link_id),
-    post_fullname: link_id,
-    post_created_ts: state.postCreated,
+    sr_name: subreddit.uuid,
+    sr_id: convertId(subreddit.name),
+    parent_id: data.parentId,
+    post_id: convertId(post.name),
+    post_fullname: post.name,
+    post_created_ts: post.createdUTC,
+    user_name: user.name,
+    user_id: user.id,
+    comment_id: convertId(comment.name),
+    comment_fullname: comment.name,
+    comment_body: comment.body,
+    parent_id: convertId(parent.name),
+    parent_fullname: parent.name,
+    parent_created_ts: parent.createdUTC,
   };
 
   return payload;
-  */
-  return {};
 }
 
 export const EVENT__COMMENT_REPLY = 'EVENT__COMMENT_REPLY';
-export const reply = () => async (dispatch, getState, { waitForState }) => {
+export const reply = ({ comment }) => async (dispatch, getState, { waitForState }) => {
   let state = getState();
 
   return await waitForState(state => state.user.name && state.accounts[state.user.name], () => {
     state = getState();
-    console.log('COMMENT REPLY', buildCommentData(state));
+    console.log('COMMENT REPLY', buildCommentData(state, comment));
   });
 };
