@@ -20,12 +20,11 @@ const actionEventMap = {
 };
 
 export default store => next => action => {
-  const result = next(action);
   const trackingAction = actionEventMap[action.type];
 
   if (trackingAction) {
     store.dispatch(trackingAction(action));
   }
 
-  return result;
+  return next(action);
 };

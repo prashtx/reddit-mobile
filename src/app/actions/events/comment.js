@@ -3,7 +3,6 @@ import {
   convertId,
   getCurrentSubredditFromState,
   getCurrentPostFromState,
-  getCurrentUserFromState,
   getThingFromStateById,
 } from './utils';
 
@@ -17,7 +16,6 @@ export function buildCommentData(state, comment) {
     ...getBasePayload(state),
     sr_name: subreddit.uuid,
     sr_id: convertId(subreddit.name),
-    parent_id: data.parentId,
     post_id: convertId(post.name),
     post_fullname: post.name,
     post_created_ts: post.createdUTC,

@@ -1,10 +1,12 @@
-import { getBasePayload, convertId } from './utils';
 import { buildPageviewData } from './pageview';
 
 export function buildSearchData(state) {
+  const payload = {
+    ...buildPageviewData(state),
+  };
   /*
   */
-  return {};
+  return payload;
 }
 
 export const EVENT__SEARCH = 'EVENT__SEARCH';

@@ -1,56 +1,40 @@
-import url from 'url';
 import { NIGHTMODE } from 'app/actions/theme';
-import { convertId } from './utils';
+
+import {
+  getBasePayload,
+  convertId,
+  getCurrentSubredditFromState,
+  //getCurrentPostFromState,
+  //getCurrentUserFromState,
+  //getThingFromStateById,
+} from './utils';
+
+//const LINK_LIMIT = 25;
 
 export function buildPageviewData (state) {
+  //const post = getCurrentPostFromState(state);
+  const subreddit = getCurrentSubredditFromState(state);
+  //const user = getCurrentUserFromState(state); 
+
   const data = {
+    ...getBasePayload(state),
     language: 'en', // NOTE: update when there are translations
+    dnt: !!window.DO_NOT_TRACK,
+    compact_view: state.compact,
   };
-
-  const {
-    session,
-    platform,
-    accounts,
-    user,
-    loid,
-  } = state;
-
-  const { currentPage } = platform;
-  const account = accounts[user.name];
-
-  if (currentPage.referrer) {
-    data.referrer_url = currentPage.referrer;
-    data.referrer_domain = url.parse(currentPage.referrer).host;
-  }
-
-  // todo implement DNT
-  //data.dnt = !!window.DO_NOT_TRACK;
-
-  console.log(session, account);
-  // If there is a logged-in user, add the user's data to the payload
-  if (session.isValid && account) {
-    data.user_name = user.name;
-    data.user_id = convertId(account.id);
-  } else {
-    // Otherwise, send in logged-out ID
-    data.loid = loid.loid;
-    data.loid_created = loid.loidcreated;
-  }
-
-  data.compact_view = state.compact;
 
   if (state.theme === NIGHTMODE) {
     data.nightmode = true;
   }
 
-  /* figure out what we're looking at
-  const LINK_LIMIT = 25;
-  // If we're looking at a subreddit, include the info in the payload
-  if (props.data.subreddit) {
-    data.sr_id = convertId(props.data.subreddit.name);
-    data.sr_name = props.data.subreddit.id;
+  // If we're on a subreddit (or a post in a subreddit) , include the info in
+  // the payload
+  if (subreddit) {
+    data.sr_id = convertId(subreddit.name);
+    data.sr_name = subreddit.uuid;
   }
 
+  /* figure out what we're looking at
   // If we're looking at a list of links or comments, include the sort order
   // (or a default). If it's just a list of links, not comments, also include
   // the page size.
