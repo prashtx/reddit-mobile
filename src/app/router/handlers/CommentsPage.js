@@ -2,10 +2,15 @@ import { BaseHandler, METHODS } from '@r/platform/router';
 import * as platformActions from '@r/platform/actions';
 import { models } from '@r/api-client';
 
+import isFakeSubreddit from 'lib/isFakeSubreddit';
 import { cleanObject } from 'lib/cleanObject';
+
 import * as commentsPageActions from 'app/actions/commentsPage';
 import * as replyActions from 'app/actions/reply';
+import * as subredditActions from 'app/actions/subreddits';
+
 import { fetchUserBasedData } from './handlerCommon';
+import PostsFromSubreddit from './PostsFromSubreddit';
 
 const { POST_TYPE } = models.ModelTypes;
 const PostIdRegExp = new RegExp(`^${POST_TYPE}_`);
@@ -48,6 +53,12 @@ export default class CommentsPage extends BaseHandler {
 
     dispatch(commentsPageActions.fetchCommentsPage(commentsPageParams));
     fetchUserBasedData(dispatch);
+
+    const subredditPostsParams = PostsFromSubreddit.PageParamsToSubredditPostsParams(this);
+    const { subredditName } = subredditPostsParams;
+    if (!isFakeSubreddit(subredditName)) {
+      dispatch(subredditActions.fetchSubreddit(subredditName));
+    }
   }
 
   async [METHODS.POST](dispatch, getState, { waitForState }) {
