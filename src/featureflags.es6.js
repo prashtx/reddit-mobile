@@ -11,6 +11,7 @@ const {
   VARIANT_NEXTCONTENT_BOTTOM,
   VARIANT_NEXTCONTENT_MIDDLE,
   VARIANT_NEXTCONTENT_BANNER,
+  VARIANT_NEXTCONTENT_TOP3,
 } = constants.flags;
 
 const config = {
@@ -64,6 +65,14 @@ const config = {
     subreddit: 'pic',
     and: [{
       variant: 'nextcontent_mweb:banner',
+      loggedin: false,
+    }],
+  }, // XXX
+  [VARIANT_NEXTCONTENT_TOP3]: {
+    url: 'experimentnextcontenttop3',
+    subreddit: 'AskReddit',
+    and: [{
+      variant: 'nextcontent_mweb:top3',
       loggedin: false,
     }],
   }, // XXX

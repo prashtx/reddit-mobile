@@ -243,7 +243,8 @@ class ListingPage extends BasePage {
       !expandComments &&
       (this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_TOP) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
-       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING));
+       this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
+       this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_TOP3));
 
     let footerClass = '';
     if (this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM) ||
@@ -256,6 +257,7 @@ class ListingPage extends BasePage {
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_RELATED) ||
        this.state.feature.enabled(constants.flags.VARIANT_RELEVANCY_ENGAGING) ||
        this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BANNER) ||
+       this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_TOP3) ||
        this.state.feature.enabled(constants.flags.VARIANT_NEXTCONTENT_BOTTOM));
 
     const relevantMiddle =

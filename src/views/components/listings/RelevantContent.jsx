@@ -27,6 +27,7 @@ const {
   VARIANT_NEXTCONTENT_BOTTOM,
   VARIANT_NEXTCONTENT_MIDDLE,
   VARIANT_NEXTCONTENT_BANNER,
+  VARIANT_NEXTCONTENT_TOP3,
 } = constants.flags;
 
 function mod(m, n) {
@@ -336,9 +337,11 @@ export default class RelevantContent extends BaseComponent {
       listingId,
     } = this.props;
 
-    if (feature.enabled(VARIANT_RELEVANCY_TOP)) {
+    if (feature.enabled(VARIANT_RELEVANCY_TOP) ||
+        feature.enabled(VARIANT_NEXTCONTENT_TOP3)) {
       // Show top posts from this subreddit
       const topLinks = relevant.topLinks;
+      // XXX for nextcontent-top3, filter out stuff the user has seen.
       const predicate = (link =>
           !link.over_18 &&
           link.id !== listingId &&

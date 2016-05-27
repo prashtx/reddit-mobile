@@ -64,6 +64,7 @@ export default {
     VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
     VARIANT_NEXTCONTENT_MIDDLE: 'experimentNextContentMiddle',
     VARIANT_NEXTCONTENT_BANNER: 'experimentNextContentBanner',
+    VARIANT_NEXTCONTENT_TOP3: 'experimentNextContentTop3',
   },
 
   themes: {
