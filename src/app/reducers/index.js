@@ -8,7 +8,11 @@ import compact from './compact';
 import expandedPosts from './expandedPosts';
 import hiddenRequests from './hiddenRequests';
 import loid from './loid';
+<<<<<<< 28cfddc772be8b238025139a087599a914296547
 import posts from './posts';
+=======
+import meta from './meta';
+>>>>>>> Search events, sans pageview data
 import postsLists from './postsLists';
 import replying from './replying';
 import savedRequests from './savedRequests';
@@ -34,6 +38,7 @@ export default {
   expandedPosts,
   hiddenRequests,
   loid,
+  meta,
   posts,
   postsLists,
   replying,

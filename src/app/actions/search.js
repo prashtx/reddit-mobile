@@ -24,5 +24,23 @@ export const search = searchParams => async (dispatch, getState) => {
   dispatch(fetching(id, searchParams));
 
   const apiResponse = await SearchEndpoint.get(apiOptionsFromState(state), searchParams);
+  dispatch(searched(searchParams, apiResponse));
+  dispatch(receivedResponse(apiResponse));
+
+  const subreddits = subredditFilter(apiResponse.results);
+  const posts = postFilter(apiResponse.results);
+
   dispatch(received(id, apiResponse));
 };
+
+export const SEARCHED = 'SEARCHED';
+export const searched = (searchParams, response) => ({ type: SEARCHED, searchParams, response });
+
+export const OPEN_SEARCH = 'OPEN_SEARCH';
+export const openSearch = () => ({ type: OPEN_SEARCH });
+
+export const CLOSE_SEARCH = 'CLOSE_SEARCH';
+export const closeSearch = () => ({ type: CLOSE_SEARCH });
+
+export const CLEAR_SEARCH = 'CLEAR_SEARCH';
+export const clearSearch = () => ({ type: CLEAR_SEARCH });

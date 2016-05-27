@@ -16,6 +16,10 @@ const actionEventMap = {
   [login.LOGGED_IN]: loginEvent.login,
   //[register.REGISTERED]: registerEvent.register,
   [comment.REPLIED]: commentEvent.reply,
+  [search.OPEN_SEARCH]: searchEvent.opened,
+  [search.SEARCHED]: searchEvent.executed,
+  [search.CLOSE_SEARCH]: searchEvent.cancelled,
+  [search.CLEAR_SEARCH]: searchEvent.formCleared,
   // submit post
 };
 

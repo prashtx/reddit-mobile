@@ -25,10 +25,15 @@ const overlayClassName = (props) => {
   return className;
 };
 
+const onClose = (props) => () => {
+  props.onClose();
+  props.closeOverlayMenu();
+};
+
 export const OverlayMenu = (props) => (
   <nav
     className={ overlayClassName(props) }
-    onClick={ props.closeOverlayMenu }
+    onClick={ onClose(props) }
   >
     <ul className='OverlayMenu-ul list-unstyled' onClick={ stopClickPropagation }>
       { props.children }
@@ -36,8 +41,15 @@ export const OverlayMenu = (props) => (
   </nav>
 );
 
+OverlayMenu.defaultProps = {
+  onClose: () => {},
+};
+
 OverlayMenu.propTypes = {
   fullscreen: T.bool,
+  closeOverlayMenu: T.func,
+  onClose: T.func,
+  children: T.array,
 };
 
 const mapDispatchProps = (dispatch) => ({
