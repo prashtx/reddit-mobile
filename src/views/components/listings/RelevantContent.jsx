@@ -67,6 +67,8 @@ export default class RelevantContent extends BaseComponent {
     this.renderCarouselPost = this.renderCarouselPost.bind(this);
     this.goToSubreddit = this.goToSubreddit.bind(this);
     this.goToPost = this.goToPost.bind(this);
+    this.goToRelevancyPost = this.goToRelevancyPost.bind(this);
+    this.goToNextContentPost = this.goToNextContentPost.bind(this);
     this.maybeShowBanner = this.maybeShowBanner.bind(this);
   }
 
@@ -122,8 +124,8 @@ export default class RelevantContent extends BaseComponent {
       experimentName: 'relevancy_mweb',
       linkIndex,
       linkName,
-      refererPageType: isSelfText ? 'self' : 'link',
-      refererUrl: window.location.href,
+      referrerPageType: isSelfText ? 'self' : 'link',
+      referrerUrl: window.location.href,
       targetId: parseInt(id, 36),
       targetUrl: url,
       targetName: name,
@@ -133,20 +135,20 @@ export default class RelevantContent extends BaseComponent {
     app.redirect(url);
   }
 
-  goToPost(e, url, id, linkIndex) {
+  goToPost(e, { eventType, experimentName, linkName, url, id, linkIndex }) {
     e.preventDefault();
     const { app, isSelfText, loid, loidcreated } = this.props;
     // Send event
-    // XXX change event type and experiment name
     app.emit('click:experiment', {
-      eventType: 'cs.relevant_posts_mweb_click',
+      eventType,
       loid,
       loidcreated,
-      experimentName: 'relevancy_mweb',
+      experimentName,
       linkIndex,
-      linkName: `top post ${linkIndex}`,
-      refererPageType: isSelfText ? 'self' : 'link',
-      refererUrl: window.location.href,
+      // linkName: `top post ${linkIndex}`,
+      linkName,
+      referrerPageType: isSelfText ? 'self' : 'link',
+      referrerUrl: window.location.href,
       targetFullname: id,
       targetUrl: url,
       targetType: 'link',
@@ -155,8 +157,42 @@ export default class RelevantContent extends BaseComponent {
     app.redirect(url);
   }
 
+  goToRelevancyPost(e, { url, id, linkIndex }) {
+    return this.goToPost(e, {
+      eventType: 'cs.relevant_posts_mweb_click',
+      experimentName: 'relevancy_mweb',
+      linkName: `top post ${linkIndex}`,
+      url,
+      id,
+      linkIndex,
+    });
+  }
+
+  goToNextContentPost(e, { url, id, linkIndex }) {
+    // XXX change event type and experiment name
+    return this.goToPost(e, {
+      eventType: 'cs.nextcontent_posts_mweb_click', // XXX
+      experimentName: 'nextcontent_mweb', // XXX
+      linkName: `next content ${linkIndex}`,
+      url,
+      id,
+      linkIndex,
+    });
+  }
+
   renderPostList(posts) {
-    const { width } = this.props;
+    const { width, feature } = this.props;
+
+    let makeOnClick;
+    if (feature.enabled(VARIANT_RELEVANCY_TOP)) {
+      makeOnClick = (url, name, i) => (
+        e => this.goToRelevancyPost(e, { url, id: name, linkIndex: i + 1 })
+      );
+    } else if (feature.enabled(VARIANT_NEXTCONTENT_TOP3)) {
+      makeOnClick = (url, name, i) => (
+        e => this.goToNextContentPost(e, { url, id: name, linkIndex: i + 1 })
+      );
+    }
 
     return posts.map((post, i) => {
       const linkExternally = post.disable_comments;
@@ -170,7 +206,7 @@ export default class RelevantContent extends BaseComponent {
         thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
         cleanUrl: '#',
       };
-      const onClick = (e => this.goToPost(e, url, name, i + 1));
+      const onClick = makeOnClick(url, name, i);
       const noop = (e => e.preventDefault());
       return (
         <article ref='rootNode' className='Post' key={ id }>
@@ -232,7 +268,7 @@ export default class RelevantContent extends BaseComponent {
       thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
       cleanUrl: '#',
     };
-    const onClick = (e => this.goToPost(e, url, name, i + 1));
+    const onClick = (e => this.goToNextContentPost(e, { url, id: name, linkIndex: i + 1 }));
     let articleClass;
     if (offset < 0) {
       articleClass = 'NextContent__carousel-prev';
@@ -392,10 +428,6 @@ export default class RelevantContent extends BaseComponent {
         feature.enabled(VARIANT_NEXTCONTENT_BANNER)) {
       const { displayBanner } = this.state;
 
-      // if (feature.enabled(VARIANT_NEXTCONTENT_BANNER) && !displayBanner) {
-      //   return null;
-      // }
-
       const { topLinks } = relevant;
       // XXX rename some of these bindings
       let post;
@@ -424,7 +456,7 @@ export default class RelevantContent extends BaseComponent {
         thumbnail: post.thumbnail || '/img/placeholder-thumbnail.svg',
         cleanUrl: '#',
       };
-      const onClick = (e => this.goToPost(e, url, name, i + 1));
+      const onClick = (e => this.goToNextContentPost(e, { url, id: name, linkIndex: 0 }));
       const noop = (e => e.preventDefault());
 
       let variant = 'banner';
@@ -452,7 +484,7 @@ export default class RelevantContent extends BaseComponent {
           onClick={ onClick }
           style={ {
             WebkitTransform: `translate3d(0, ${y}px, 0)`,
-            transform: `translate3d(0, ${y}px, 0)`
+            transform: `translate3d(0, ${y}px, 0)`,
           } }
         >
           <article ref='rootNode' className='Post' key={ id }>
@@ -504,7 +536,7 @@ export default class RelevantContent extends BaseComponent {
         return nextContent(0);
       }
       return (
-        <Motion style={ { y: spring(this.state.displayBanner ? 0 : 200) } }>
+        <Motion style={ { y: spring(displayBanner ? 0 : 200) } }>
           { ({ y }) =>
             nextContent(y)
           }
