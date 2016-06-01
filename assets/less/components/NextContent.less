@@ -1,7 +1,7 @@
 @thumbnail-size: 50px;
 @nextcontent-height: @thumbnail-size + 2 * @grid-size;
+@nextcontent-text-row-height: @nextcontent-height / 3;
 @nextcontent-link-width: 80px;
-@nextcontent-carousel-link-width: 180px;
 .NextContent {
   width: 100%;
   height: @nextcontent-height;
@@ -59,16 +59,13 @@
     &__header {
       @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
       margin-left: @rendered-thumbnail-size;
-      // min-height: @rendered-thumbnail-size;
       min-height: @rendered-thumbnail-size - 2 * @grid-size;
       margin-bottom: @grid-size;
     }
     &__post-title-line {
       font-size: 14px;
-      // padding: 0 2 * @grid-size @half-grid-size;
       padding: 0 0 @half-grid-size;
-      // padding-bottom: @half-grid-size;
-      height: 40px; // XXX base this on the relevant variables/values
+      height: @thumbnail-size;
       white-space: normal;
       display: inline-block;
       overflow: hidden;
@@ -148,7 +145,7 @@
   }
 
   .middle& {
-    height: @thumbnail-size + 2 * @grid-size + 50px; // XXX
+    height: 2 * @thumbnail-size + 1.5 * @grid-size;
     padding: 0 0 @grid-size 0;
     overflow: hidden;
     .themeify({
@@ -164,12 +161,12 @@
     &__header {
       @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
       margin-left: @rendered-thumbnail-size;
-      // min-height: @rendered-thumbnail-size;
-      min-height: @rendered-thumbnail-size - 2 * @grid-size;
+      min-height: @thumbnail-size;
       margin-bottom: @grid-size;
     }
+
     &__post-title-line {
-      height: 44px; // XXX base this on the relevant variables/values
+      height: 2 * @nextcontent-text-row-height;
       overflow: hidden;
       white-space: normal;
       padding-top: @grid-size / 2;
@@ -179,6 +176,7 @@
         color: @theme-body-text-color;
       });
     }
+
     &__post-descriptor-line {
       display: block;
       padding-right: 0;
@@ -188,61 +186,89 @@
       white-space: nowrap;
       position: relative;
       vertical-align: middle;
-      // padding-right: 3em;
+      padding-right: @grid-size / 2;
       .themeify({
         color: @theme-meta-text-color;
       });
-      // XXX move this into shared styles for the 3 variants
       &:last-child {
         padding-bottom: @grid-size / 2;
       }
     }
+
+    &__heading {
+      text-transform: uppercase;
+      font-size: @font-size-h4;
+      line-height: 1.5;
+      height: @font-size-h4 * 1.5 + @grid-size / 2;
+      text-align: center;
+      .themeify({
+        color: @theme-meta-text-color;
+        background-color: @theme-body-color;
+      });
+    }
   }
+
   &__drag-container {
     position: relative;
   }
 
-  &.middle &__heading {
-    text-transform: uppercase;
-    font-size: @font-size-h4;
-    line-height: 1.5;
-    height: 27px; // XXX
-    text-align: center;
-    .themeify({
-      color: @theme-meta-text-color;
-      background-color: @theme-body-color;
-    });
-  }
 
   &.middle article&__carousel-prev {
-    // width: @nextcontent-link-width + @thumbnail-size;
-    width: calc(~"100% - 100px");
+    width: calc(~"100% - " 2 * @thumbnail-size);
     position: absolute;
     top: 0;
-    left: calc(~"130px - 100%"); // XXX
+    left: calc(150px - @grid-size ~" - 100%");
   }
   &.middle &__carousel-prev &__header {
     margin-top: 0;
     margin-bottom: 0;
   }
   &.middle article&__carousel-primary {
-    // width: @nextcontent-link-width + @thumbnail-size;
-    width: calc(~"100% - 100px");
+    width: calc(~"100% - " 2 * @thumbnail-size);
     position: relative;
-    // left: calc(~"100% - "(@nextcontent-carousel-link-width + @thumbnail-size));
-    margin-left: 50px; // XXX
+    margin-left: @thumbnail-size;
     margin-top: @grid-size;
   }
   &.middle article&__carousel-next {
-    // width: @nextcontent-carousel-link-width + @thumbnail-size;
-    width: calc(~"100% - 100px");
+    width: calc(~"100% - " 2 * @thumbnail-size);
     position: absolute;
     top: 0;
-    left: 390px;
+    left: calc(~"100% - 50px + " @grid-size);
   }
   &.middle article&__carousel-next &__header {
     margin-top: 0;
     margin-bottom: 0;
+  }
+
+  &__next-link {
+    right: 0;
+    position: absolute;
+    width: @nextcontent-link-width;
+    display: inline-block;
+    font-size: @font-size-base;
+    line-height: 1.5;
+    text-align: center;
+    text-transform: uppercase;
+    color: @blue;
+    margin-top: (@nextcontent-height - (1.5 * @font-size-base)) / 2;
+    margin-bottom: (@nextcontent-height - (1.5 * @font-size-base)) / 2;
+    margin-right: @grid-size;
+    margin-left: @grid-size;
+    a, a:hover, a:visited {
+      vertical-align: bottom;
+      text-decoration: none;
+      .themeify({
+        color: @blue;
+      });
+      .icon-inline {
+        font-size: @font-size-base;
+        line-height: 1.5;
+        .themeify({
+          color: @blue;
+          text-decoration: none;
+        });
+      }
+    }
   }
 
   &.banner &__next-link {
@@ -262,44 +288,6 @@
       }
     }
   }
-  &__next-link {
-    right: 0;
-    position: absolute;
-    width: @nextcontent-link-width;
-    display: inline-block;
-    font-size: @font-size-base;
-    line-height: 1.5;
-    text-align: center;
-    text-transform: uppercase;
-    color: @blue;
-    // height: @thumbnail-size;
-    margin-top: (@nextcontent-height - (1.5 * @font-size-base)) / 2;
-    margin-bottom: (@nextcontent-height - (1.5 * @font-size-base)) / 2;
-    margin-right: @grid-size;
-    margin-left: @grid-size;
-    // XXX background: @blue;
-    // margin-top: 3*@grid-size;
-    // margin-bottom: 3*@grid-size;
-    // margin-left: @grid-size;
-    // margin-right: @grid-size;
-    // padding-top: @grid-size;
-    // padding-bottom: @grid-size;
-    a, a:hover, a:visited {
-      vertical-align: bottom;
-      text-decoration: none;
-      .themeify({
-        color: @blue;
-      });
-      .icon-inline {
-        font-size: @font-size-base;
-        line-height: 1.5;
-        .themeify({
-          color: @blue;
-          text-decoration: none;
-        });
-      }
-    }
-  }
 
   .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
     @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
@@ -309,8 +297,6 @@
     margin-top: @grid-size;
     margin-bottom: @grid-size;
   }
-
-
 }
 
 .container.with-footer-nextcontent {
