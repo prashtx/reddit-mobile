@@ -1,8 +1,8 @@
 import * as platform from '@r/platform/actions';
+
 import * as search from 'app/actions/search';
 import * as login from 'app/actions/login';
 import * as comment from 'app/actions/comment';
-
 import * as pageviewEvent from 'app/actions/events/pageview';
 import * as searchEvent from 'app/actions/events/search';
 import * as loginEvent from 'app/actions/events/login';

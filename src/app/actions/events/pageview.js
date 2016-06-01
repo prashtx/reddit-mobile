@@ -1,4 +1,8 @@
+import { parseRoute } from '@r/platform/navigationMiddleware';
+
 import { NIGHTMODE } from 'app/actions/theme';
+
+import routes from 'app/router';
 
 import {
   getBasePayload,
@@ -12,8 +16,18 @@ import {
 //const LINK_LIMIT = 25;
 
 export function buildPageviewData (state) {
-  //const post = getCurrentPostFromState(state);
+  const { handler } = parseRoute(state.platform.currentPage.url, routes);
+  const handlerName = handler.name;
+
+  if (!handlerName) {
+    return;
+  }
+
+  console.log(handlerName);
+
   const subreddit = getCurrentSubredditFromState(state);
+
+  //const post = getCurrentPostFromState(state);
   //const user = getCurrentUserFromState(state); 
 
   const data = {
