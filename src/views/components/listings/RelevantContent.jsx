@@ -303,10 +303,10 @@ export default class RelevantContent extends BaseComponent {
             renderMediaFullbleed={ true }
             showLinksInNewTab={ false }
           />
-          <header className='PostHeader size-compact m-thumbnail-margin'>
-            <div className='PostHeader__post-descriptor-line'>
+          <header className='NextContent__header'>
+            <div className='NextContent__post-descriptor-line'>
             <a
-              className='PostHeader__post-title-line'
+              className='NextContent__post-title-line'
               href='#'
               onClick={ noop }
               target={ linkExternally ? '_blank' : null }
@@ -314,7 +314,7 @@ export default class RelevantContent extends BaseComponent {
               { title }
             </a></div>
             <a
-              className='PostHeader__post-descriptor-line'
+              className='NextContent__post-descriptor-line'
               href='#'
               onClick={ noop }
               target={ linkExternally ? '_blank' : null }

@@ -7,6 +7,8 @@
   height: @nextcontent-height;
   cursor: pointer;
 
+  padding: @grid-size;
+
   .Post {
     margin-bottom: 0;
   }
@@ -145,7 +147,7 @@
     }
   }
 
-  &.middle {
+  .middle& {
     height: @thumbnail-size + 2 * @grid-size + 50px; // XXX
     padding: 0 0 @grid-size 0;
     overflow: hidden;
@@ -157,6 +159,44 @@
     @inNightMode: {
       background-color: @black;
     });
+  }
+  .middle& & {
+    &__header {
+      @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
+      margin-left: @rendered-thumbnail-size;
+      // min-height: @rendered-thumbnail-size;
+      min-height: @rendered-thumbnail-size - 2 * @grid-size;
+      margin-bottom: @grid-size;
+    }
+    &__post-title-line {
+      height: 44px; // XXX base this on the relevant variables/values
+      overflow: hidden;
+      white-space: normal;
+      padding-top: @grid-size / 2;
+      font-size: 14px;
+      display: inline-block;
+      .themeify({
+        color: @theme-body-text-color;
+      });
+    }
+    &__post-descriptor-line {
+      display: block;
+      padding-right: 0;
+      padding-bottom: 0;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      vertical-align: middle;
+      // padding-right: 3em;
+      .themeify({
+        color: @theme-meta-text-color;
+      });
+      // XXX move this into shared styles for the 3 variants
+      &:last-child {
+        padding-bottom: @grid-size / 2;
+      }
+    }
 
     .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
       .PostHeader__post-title-line {
@@ -205,6 +245,7 @@
     position: relative;
     // left: calc(~"100% - "(@nextcontent-carousel-link-width + @thumbnail-size));
     margin-left: 50px; // XXX
+    margin-top: @grid-size;
   }
   &.middle article&__carousel-next {
     // width: @nextcontent-carousel-link-width + @thumbnail-size;
@@ -222,8 +263,6 @@
     // left: 390px; // XXX
     // // XXX display: inline-block;
   }
-
-  padding: @grid-size;
 
   &.banner &__next-link {
     a, a:hover, a:visited {
