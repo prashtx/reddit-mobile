@@ -7,6 +7,24 @@
   height: @nextcontent-height;
   cursor: pointer;
 
+  .Post {
+    margin-bottom: 0;
+  }
+
+  .PostContent.size-compact {
+    position: absolute;
+    width: @thumbnail-size;
+    height: @thumbnail-size;
+    top: @grid-size;
+    left: @grid-size;
+    margin-bottom: 0;
+
+    .PostContent__image-link {
+      height: 50px;
+      width: 50px;
+    }
+  }
+
   &.bottom {
     position: fixed;
     bottom: 0px;
@@ -29,105 +47,103 @@
       background-color: @blue;
     }
   }
+
+  .banner& &, .bottom& & {
+    &__post-wrapper {
+      position: relative;
+      display: inline-block;
+      width: calc(~"100% - "@nextcontent-link-width);
+    }
+    &__header {
+      @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
+      margin-left: @rendered-thumbnail-size;
+      // min-height: @rendered-thumbnail-size;
+      min-height: @rendered-thumbnail-size - 2 * @grid-size;
+      margin-bottom: @grid-size;
+    }
+    &__post-title-line {
+      font-size: 14px;
+      // padding: 0 2 * @grid-size @half-grid-size;
+      padding: 0 0 @half-grid-size;
+      // padding-bottom: @half-grid-size;
+      height: 40px; // XXX base this on the relevant variables/values
+      white-space: normal;
+      display: inline-block;
+      overflow: hidden;
+    }
+    &__post-descriptor-line {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      vertical-align: middle;
+      padding-right: 3em;
+
+      .icon-font({
+        vertical-align: text-bottom;
+        font-size: 18px;
+        line-height: 18px;
+      });
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 3em;
+        z-index: 1;
+
+      }
+    }
+  }
+
   .banner& & {
     &__header {
-      margin-bottom: 1000px;
+      margin-top: @grid-size;
+    }
+    &__post-title-line {
+      .themeify({
+        color: @theme-light-nav-text-color;
+      });
+    }
+    &__post-descriptor-line {
+      .themeify({
+        color: @theme-meta-text-color;
+      });
+
+      &:after {
+        .themeify({
+          #gradient > .horizontal(@start-color: fade(@blue, 0%);
+            @end-color:fade(@blue, 100%) ; @end-percent: 70%);
+        });
+      }
     }
   }
-  & &__header {
-    @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
-    margin-left: @rendered-thumbnail-size;
-    // min-height: @rendered-thumbnail-size;
-    min-height: @rendered-thumbnail-size - 2 * @grid-size;
-    margin-top: @grid-size;
-    margin-bottom: @grid-size;
-  }
-  &.banner &__post-title-line {
-    font-size: 14px;
-    padding: 0 2 * @grid-size @half-grid-size;
-    // padding-bottom: @half-grid-size;
-    height: 44px; // XXX base this on the relevant variables/values
-    white-space: normal;
-    .themeify({
-      color: @theme-light-nav-text-color;
-    });
-  }
-  &.banner &__post-descriptor-line {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    overflow: hidden;
-    position: relative;
-    vertical-align: middle;
-    padding-right: 3em;
 
-    .themeify({
-      color: @theme-meta-text-color;
-    });
+  .bottom& & {
+    &__header {
+      margin-top: @grid-size / 2;
+    }
+    &__post-title-line {
+      .themeify({
+        color: @theme-body-text-color;
+      });
+    }
+    &__post-descriptor-line {
+      .themeify({
+        color: @theme-meta-text-color;
+      });
 
-    .icon-font({
-      vertical-align: text-bottom;
-      font-size: 18px;
-      line-height: 18px;
-
-      // // spacing, need to make sure the next element
-      // // isn't the seperator because it has a different
-      // // visual whitespace then a normal element / text
-      // margin-right: 2px;
-      // & + :not(.PostHeader__flush-w-icon) {
-      //   margin-left: @grid-size - 2px;
-      // }
-
-      // &.icon-nsfw {
-      //   font-size: 12px;
-      //   line-height: 14px;
-      // }
-    });
-
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 3em;
-      z-index: 1;
-
-    .themeify({
-      #gradient > .horizontal(@start-color: fade(@blue, 0%);
-        @end-color:fade(@blue, 100%) ; @end-percent: 70%);
-    });
+      &:after {
+        .themeify({
+          #gradient > .horizontal(@start-color: fade(@theme-body-color, 0%);
+            @end-color:fade(@theme-body-color, 100%) ; @end-percent: 70%);
+        });
+      }
     }
   }
-  // &.banner &__post-descriptor-line:after {
-  //   .themeify({
-  //     #gradient > .horizontal(@start-color: fade(@blue, 0%);
-  //       @end-color:fade(@blue, 100%) ; @end-percent: 70%);
-  //   });
-  // }
-
-    // article {
-    //   background-color: @blue;
-    //   .PostHeader.size-compact .PostHeader__post-title-line {
-    //     height: 44px; // XXX base this on the relevant variables/values
-    //     white-space: normal;
-    //     .themeify({
-    //       color: @theme-light-nav-text-color;
-    //     });
-    //   }
-    //   .PostHeader__post-descriptor-line {
-    //     display: block;
-    //   }
-    //   .PostHeader__post-descriptor-line:after {
-    //     .themeify({
-    //       #gradient > .horizontal(@start-color: fade(@blue, 0%);
-    //         @end-color:fade(@blue, 100%) ; @end-percent: 70%);
-    //     });
-    //   }
-    // }
-  // }
-
 
   &.middle {
     height: @thumbnail-size + 2 * @grid-size + 50px; // XXX
@@ -144,7 +160,7 @@
 
     .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
       .PostHeader__post-title-line {
-        height: 44px; // XXX base this on the relevant variables/values
+        height: 40px; // XXX base this on the relevant variables/values
         overflow: hidden;
         white-space: normal;
         padding-top: @grid-size / 2;
@@ -152,6 +168,7 @@
       .PostHeader__post-descriptor-line {
         display: block;
         padding-right: 0;
+        padding-bottom: @grid-size / 2;
       }
     }
   }
@@ -207,17 +224,6 @@
   }
 
   padding: @grid-size;
-
-  &.bottom &__post-wrapper {
-    position: relative;
-    display: inline-block;
-    width: calc(~"100% - "@nextcontent-link-width);
-  }
-  &.banner &__post-wrapper {
-    position: relative;
-    display: inline-block;
-    width: calc(~"100% - "@nextcontent-link-width);
-  }
 
   &.banner &__next-link {
     a, a:hover, a:visited {
@@ -275,25 +281,6 @@
     }
   }
 
-  .Post {
-    margin-bottom: 0;
-  }
-
-  .PostContent.size-compact {
-    position: absolute;
-    // XXX Move these to a variable
-    width: @thumbnail-size;
-    height: @thumbnail-size;
-    top: @grid-size;
-    left: @grid-size;
-    margin-bottom: 0;
-
-    .PostContent__image-link {
-      height: 50px;
-      width: 50px;
-    }
-  }
-
   .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
     @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
     margin-left: @rendered-thumbnail-size;
@@ -305,7 +292,6 @@
 
 
 }
-
 
 .container.with-footer-nextcontent {
   margin-bottom: @nextcontent-height + @grid-size;
