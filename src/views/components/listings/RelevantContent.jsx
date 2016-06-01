@@ -2,8 +2,9 @@ import React from 'react';
 
 import take from 'lodash/array/take';
 import filter from 'lodash/collection/filter';
+import range from 'lodash/utility/range';
 
-import { Draggable, Swipeable, defineSwipe } from 'react-touch';
+import { Swipeable, defineSwipe } from 'react-touch';
 import { Motion, spring } from 'react-motion';
 
 import constants from '../../../constants';
@@ -52,7 +53,7 @@ export default class RelevantContent extends BaseComponent {
 
     if (props.feature.enabled(VARIANT_NEXTCONTENT_MIDDLE)) {
       this.state = {
-        postNum: 0,
+        carouselIndex: 0,
         ...this.state,
       };
     }
@@ -253,7 +254,7 @@ export default class RelevantContent extends BaseComponent {
     });
   }
 
-  renderCarouselPost(post, i, offset) {
+  renderCarouselPost(post, i, offset, { dx }) {
     const { width } = this.props;
     const noop = (e => e.preventDefault());
 
@@ -270,20 +271,24 @@ export default class RelevantContent extends BaseComponent {
     };
     const onClick = (e => this.goToNextContentPost(e, { url, id: name, linkIndex: i + 1 }));
     let articleClass;
+    let translateX;
     if (offset < 0) {
       articleClass = 'NextContent__carousel-prev';
+      translateX = `calc(${dx + (offset + 1)*100}% + ${8*(offset + 1)}px)`;
     } else if (offset > 0) {
       articleClass = 'NextContent__carousel-next';
+      translateX = `calc(${dx + (offset - 1)*100}% + ${8*(offset - 1)}px)`;
     } else {
       articleClass = 'NextContent__carousel-primary';
+      translateX = `${dx}%`;
     }
 
-    return dX => (
+    return (
       <article
         ref='rootNode'
         className={ `Post ${articleClass}` }
         key={ `${id}-${offset}` }
-        style={ { transform: `translate3d(${dX}px, 0, 0` } }
+        style={ { transform: `translate3d(${translateX}, 0, 0)` } }
       >
         <div className='NextContent__post-wrapper' onClick={ onClick }>
           <PostContent
@@ -328,27 +333,21 @@ export default class RelevantContent extends BaseComponent {
   }
 
   renderNextPostCarousel(posts) {
-    const { postNum } = this.state;
+    const { carouselIndex } = this.state;
 
     const postCount = Math.min(posts.length, NUM_NEXT_LINKS);
 
-    const prevNum = mod(postNum - 1, postCount);
-    const nextNum = mod(postNum + 1, postCount);
-
-    // XXX set the index params
-    const prevPost = this.renderCarouselPost(posts[prevNum], 0, -1);
-    const primaryPost = this.renderCarouselPost(posts[postNum], 0, 0);
-    const nextPost = this.renderCarouselPost(posts[nextNum], 0, 1);
+    const postIndices = range(1 - postCount, postCount);
 
     const onSwipeLeft = () => {
       this.setState({
-        postNum: mod(postNum + 1, postCount),
+        carouselIndex: Math.min(carouselIndex + 1, postCount - 1),
       });
     };
 
     const onSwipeRight = () => {
       this.setState({
-        postNum: mod(postNum - 1, postCount),
+        carouselIndex: Math.max(carouselIndex - 1, 1 - postCount),
       });
     };
 
@@ -357,23 +356,22 @@ export default class RelevantContent extends BaseComponent {
     });
 
     return (
-      <Swipeable
-        config={ swipeConfig }
-        onSwipeLeft={ onSwipeLeft }
-        onSwipeRight={ onSwipeRight }
-      >
-        <Draggable style={ { left: 0} } position={ { left: 0 } }>
-          { ({ dx, left }) => {
-            console.log(dx, left);//XXX
-            return (
-          <div className='NextContent__drag-container' styl>
-            { prevPost(left) }
-            { primaryPost(left) }
-            { nextPost(left) }
-          </div>
-          );}}
-        </Draggable>
-      </Swipeable>
+      <Motion style={ { dx: spring(-100*carouselIndex) } }>
+        { style => (
+          <Swipeable
+            config={ swipeConfig }
+            onSwipeLeft={ onSwipeLeft }
+            onSwipeRight={ onSwipeRight }
+          >
+            <div className='NextContent__drag-container'>
+              { postIndices.map(i => {
+                const postNum = mod(i, postCount);
+                return this.renderCarouselPost(posts[postNum], postNum, i, style);
+              }) }
+            </div>
+          </Swipeable>
+        ) }
+      </Motion>
     );
   }
 
