@@ -3,7 +3,7 @@ import React from 'react';
 import take from 'lodash/array/take';
 import filter from 'lodash/collection/filter';
 
-import { Swipeable } from 'react-touch';
+import { Draggable, Swipeable, defineSwipe } from 'react-touch';
 import { Motion, spring } from 'react-motion';
 
 import constants from '../../../constants';
@@ -278,12 +278,12 @@ export default class RelevantContent extends BaseComponent {
       articleClass = 'NextContent__carousel-primary';
     }
 
-        // style={ { transform: `translate3d(${dx}px, 0px, 0)`} }
-    return (
+    return dX => (
       <article
         ref='rootNode'
         className={ `Post ${articleClass}` }
         key={ `${id}-${offset}` }
+        style={ { transform: `translate3d(${dX}px, 0, 0` } }
       >
         <div className='NextContent__post-wrapper' onClick={ onClick }>
           <PostContent
@@ -335,31 +335,44 @@ export default class RelevantContent extends BaseComponent {
     const prevNum = mod(postNum - 1, postCount);
     const nextNum = mod(postNum + 1, postCount);
 
+    // XXX set the index params
     const prevPost = this.renderCarouselPost(posts[prevNum], 0, -1);
     const primaryPost = this.renderCarouselPost(posts[postNum], 0, 0);
     const nextPost = this.renderCarouselPost(posts[nextNum], 0, 1);
 
     const onSwipeLeft = () => {
-      console.log('swipe!'); // XXX
       this.setState({
         postNum: mod(postNum + 1, postCount),
       });
     };
 
     const onSwipeRight = () => {
-      console.log('swipe!'); // XXX
       this.setState({
         postNum: mod(postNum - 1, postCount),
       });
     };
 
+    const swipeConfig = defineSwipe({
+      swipeDistance: 50, // pixels
+    });
+
     return (
-      <Swipeable onSwipeLeft={ onSwipeLeft } onSwipeRight={ onSwipeRight }>
-        <div className='NextContent__drag-container'>
-          { prevPost }
-          { primaryPost }
-          { nextPost }
-        </div>
+      <Swipeable
+        config={ swipeConfig }
+        onSwipeLeft={ onSwipeLeft }
+        onSwipeRight={ onSwipeRight }
+      >
+        <Draggable style={ { left: 0} } position={ { left: 0 } }>
+          { ({ dx, left }) => {
+            console.log(dx, left);//XXX
+            return (
+          <div className='NextContent__drag-container' styl>
+            { prevPost(left) }
+            { primaryPost(left) }
+            { nextPost(left) }
+          </div>
+          );}}
+        </Draggable>
       </Swipeable>
     );
   }
@@ -549,26 +562,9 @@ export default class RelevantContent extends BaseComponent {
     }
 
     if (feature.enabled(VARIANT_NEXTCONTENT_MIDDLE)) {
-      // const { postNum } = this.state;
-
       const topLinks = relevant.topLinks;
       const links = take(filter(topLinks, safeAndNew), NUM_NEXT_LINKS);
-      // const postCount = Math.min(links.length, NUM_NEXT_LINKS);
       const postList = this.renderNextPostCarousel(links);
-
-      // const onSwipeLeft = () => {
-      //   this.setState({
-      //     postNum: (postNum + 1) % postCount,
-      //   });
-      //   console.log('swipe!'); // XXX
-      // };
-
-      // const onSwipeRight = () => {
-      //   this.setState({
-      //     postNum: (postNum - 1) % postCount,
-      //   });
-      //   console.log('swipe!'); // XXX
-      // };
 
       return (
         <div
@@ -576,7 +572,7 @@ export default class RelevantContent extends BaseComponent {
           key='nextcontent-container'
         >
           <div className='NextContent__heading'>
-            Top Posts from r/Gaming {/* XXX */}
+            Top Posts from r/{ subredditName }
           </div>
           { postList }
         </div>
