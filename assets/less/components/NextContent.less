@@ -18,7 +18,7 @@
     });
   }
 
-  &.banner {
+  .banner& {
     position: fixed;
     bottom: @grid-size;
     padding: 0;
@@ -27,24 +27,106 @@
     left: @grid-size;
     article {
       background-color: @blue;
-      .PostHeader.size-compact .PostHeader__post-title-line {
-        height: 44px; // XXX base this on the relevant variables/values
-        white-space: normal;
-        .themeify({
-          color: @theme-light-nav-text-color;
-        });
-      }
-      .PostHeader__post-descriptor-line {
-        display: block;
-      }
-      .PostHeader__post-descriptor-line:after {
-        .themeify({
-          #gradient > .horizontal(@start-color: fade(@blue, 0%);
-            @end-color:fade(@blue, 100%) ; @end-percent: 70%);
-        });
-      }
     }
   }
+  .banner& & {
+    &__header {
+      margin-bottom: 1000px;
+    }
+  }
+  & &__header {
+    @rendered-thumbnail-size: @thumbnail-size + 2 * @grid-size;
+    margin-left: @rendered-thumbnail-size;
+    // min-height: @rendered-thumbnail-size;
+    min-height: @rendered-thumbnail-size - 2 * @grid-size;
+    margin-top: @grid-size;
+    margin-bottom: @grid-size;
+  }
+  &.banner &__post-title-line {
+    font-size: 14px;
+    padding: 0 2 * @grid-size @half-grid-size;
+    // padding-bottom: @half-grid-size;
+    height: 44px; // XXX base this on the relevant variables/values
+    white-space: normal;
+    .themeify({
+      color: @theme-light-nav-text-color;
+    });
+  }
+  &.banner &__post-descriptor-line {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    vertical-align: middle;
+    padding-right: 3em;
+
+    .themeify({
+      color: @theme-meta-text-color;
+    });
+
+    .icon-font({
+      vertical-align: text-bottom;
+      font-size: 18px;
+      line-height: 18px;
+
+      // // spacing, need to make sure the next element
+      // // isn't the seperator because it has a different
+      // // visual whitespace then a normal element / text
+      // margin-right: 2px;
+      // & + :not(.PostHeader__flush-w-icon) {
+      //   margin-left: @grid-size - 2px;
+      // }
+
+      // &.icon-nsfw {
+      //   font-size: 12px;
+      //   line-height: 14px;
+      // }
+    });
+
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 3em;
+      z-index: 1;
+
+    .themeify({
+      #gradient > .horizontal(@start-color: fade(@blue, 0%);
+        @end-color:fade(@blue, 100%) ; @end-percent: 70%);
+    });
+    }
+  }
+  // &.banner &__post-descriptor-line:after {
+  //   .themeify({
+  //     #gradient > .horizontal(@start-color: fade(@blue, 0%);
+  //       @end-color:fade(@blue, 100%) ; @end-percent: 70%);
+  //   });
+  // }
+
+    // article {
+    //   background-color: @blue;
+    //   .PostHeader.size-compact .PostHeader__post-title-line {
+    //     height: 44px; // XXX base this on the relevant variables/values
+    //     white-space: normal;
+    //     .themeify({
+    //       color: @theme-light-nav-text-color;
+    //     });
+    //   }
+    //   .PostHeader__post-descriptor-line {
+    //     display: block;
+    //   }
+    //   .PostHeader__post-descriptor-line:after {
+    //     .themeify({
+    //       #gradient > .horizontal(@start-color: fade(@blue, 0%);
+    //         @end-color:fade(@blue, 100%) ; @end-percent: 70%);
+    //     });
+    //   }
+    // }
+  // }
 
 
   &.middle {
@@ -63,6 +145,7 @@
     .PostContent.size-compact + .PostHeader.m-thumbnail-margin {
       .PostHeader__post-title-line {
         height: 44px; // XXX base this on the relevant variables/values
+        overflow: hidden;
         white-space: normal;
         padding-top: @grid-size / 2;
       }

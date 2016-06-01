@@ -373,17 +373,33 @@ export default class RelevantContent extends BaseComponent {
       listingId,
     } = this.props;
 
+    let visited = [];
+    if (localStorageAvailable()) {
+      const visitedString = localStorage.getItem('visitedPosts');
+      if (visitedString) {
+        visited = visitedString.split(',');
+      }
+    }
+
+    const safeAndNew = (link =>
+      !link.over_18 &&
+      link.id !== listingId &&
+      !link.stickied &&
+      (visited.indexOf(link.id) === -1));
+
+    const safe = (link =>
+        !link.over_18 &&
+        link.id !== listingId &&
+        !link.stickied);
+
     if (feature.enabled(VARIANT_RELEVANCY_TOP) ||
         feature.enabled(VARIANT_NEXTCONTENT_TOP3)) {
       // Show top posts from this subreddit
       const topLinks = relevant.topLinks;
-      // XXX for nextcontent-top3, filter out stuff the user has seen.
-      const predicate = (link =>
-          !link.over_18 &&
-          link.id !== listingId &&
-          !link.stickied);
+      const predicate = feature.enabled(VARIANT_NEXTCONTENT_TOP3) ? safeAndNew : safe;
       const links = take(filter(topLinks, predicate), NUM_TOP_lINKS);
       const postList = this.renderPostList(links);
+
       const onActionClick = (e => this.goToSubreddit(e, {
         url: subreddit.url,
         id: subreddit.id,
@@ -391,6 +407,7 @@ export default class RelevantContent extends BaseComponent {
         linkName: 'top 25 posts',
         linkIndex: NUM_TOP_lINKS + 1,
       }));
+
       return (
         <div className='RelevantContent container' key='relevant-container'>
           <div className='RelevantContent-header'>
@@ -410,19 +427,6 @@ export default class RelevantContent extends BaseComponent {
         </div>
       );
     }
-
-    let visited = [];
-    if (localStorageAvailable()) {
-      const visitedString = localStorage.getItem('visitedPosts');
-      if (visitedString) {
-        visited = visitedString.split(',');
-      }
-    }
-    const safeAndNew = (link =>
-      !link.over_18 &&
-      link.id !== listingId &&
-      !link.stickied &&
-      (visited.indexOf(link.id) === -1));
 
     if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM) ||
         feature.enabled(VARIANT_NEXTCONTENT_BANNER)) {
@@ -506,10 +510,10 @@ export default class RelevantContent extends BaseComponent {
                 renderMediaFullbleed={ true }
                 showLinksInNewTab={ false }
               />
-              <header className='PostHeader size-compact m-thumbnail-margin'>
-                <div className='PostHeader__post-descriptor-line'>
+              <header className='NextContent__header'>
+                <div className='NextContent__post-descriptor-line'>
                 <a
-                  className='PostHeader__post-title-line'
+                  className='NextContent__post-title-line'
                   href='#'
                   onClick={ noop }
                   target={ linkExternally ? '_blank' : null }

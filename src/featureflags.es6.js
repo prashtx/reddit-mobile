@@ -148,7 +148,7 @@ flags.addRule('userAgentSubstr', function(agents) {
 });
 
 flags.addRule('subreddit', function (name) {
-  return this.props.subredditName && this.props.subredditName === name;
+  return this.props.subredditName && this.props.subredditName.toLowerCase() === name.toLowerCase();
 });
 
 flags.addRule('variant', function (name) {
