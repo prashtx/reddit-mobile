@@ -3,7 +3,11 @@ import * as platformActions from '@r/platform/actions';
 
 import * as voteActions from 'app/actions/vote';
 
+export const NAME = 'Vote';
+
 export default class Vote extends BaseHandler {
+  name = Vote;
+
   async [METHODS.POST](dispatch, getState, { waitForState }) {
     const { thingId } = this.urlParams;
     const direction = parseInt(this.bodyParams.direction);

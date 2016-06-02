@@ -21,7 +21,11 @@ const ensurePostTypePrefix = postId => {
   return `${POST_TYPE}_${postId}`;
 };
 
+export const NAME = 'CommentsPage';
+
 export default class CommentsPage extends BaseHandler {
+  name = NAME;
+
   static pageParamsToCommentsPageParams({ urlParams, queryParams}) {
     let { postId } = urlParams;
     const { commentId } = urlParams;
