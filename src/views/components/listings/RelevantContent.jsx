@@ -1,8 +1,11 @@
 import React from 'react';
 
+import first from 'lodash/array/first';
 import take from 'lodash/array/take';
 import filter from 'lodash/collection/filter';
 import range from 'lodash/utility/range';
+import curryRight from 'lodash/function/curryRight';
+import flow from 'lodash/function/flow';
 
 import { Swipeable, defineSwipe } from 'react-touch';
 import { Motion, spring } from 'react-motion';
@@ -254,7 +257,7 @@ export default class RelevantContent extends BaseComponent {
     });
   }
 
-  renderCarouselPost(post, i, offset, { dx }) {
+  renderCarouselPost(post, i, offset) {
     const { width } = this.props;
     const noop = (e => e.preventDefault());
 
@@ -270,66 +273,61 @@ export default class RelevantContent extends BaseComponent {
       cleanUrl: '#',
     };
     const onClick = (e => this.goToNextContentPost(e, { url, id: name, linkIndex: i + 1 }));
-    let articleClass;
-    let translateX;
-    if (offset < 0) {
-      articleClass = 'NextContent__carousel-prev';
-      translateX = `calc(${dx + (offset + 1)*100}% + ${8*(offset + 1)}px)`;
-    } else if (offset > 0) {
-      articleClass = 'NextContent__carousel-next';
-      translateX = `calc(${dx + (offset - 1)*100}% + ${8*(offset - 1)}px)`;
-    } else {
-      articleClass = 'NextContent__carousel-primary';
-      translateX = `${dx}%`;
-    }
 
-    return (
-      <article
-        ref='rootNode'
-        className={ `Post ${articleClass}` }
-        key={ `${id}-${offset}` }
-        style={ { transform: `translate3d(${translateX}, 0, 0)` } }
-      >
-        <div className='NextContent__post-wrapper' onClick={ onClick }>
-          <PostContent
-            post={ postWithFallback }
-            single={ false }
-            compact={ true }
-            expandedCompact={ false }
-            onTapExpand={ function () {} }
-            width={ width }
-            toggleShowNSFW={ false }
-            showNSFW={ false }
-            editing={ false }
-            toggleEditing={ false }
-            saveUpdatedText={ false }
-            forceHTTPS={ this.forceHTTPS }
-            isDomainExternal={ this.externalDomain }
-            renderMediaFullbleed={ true }
-            showLinksInNewTab={ false }
-          />
-          <header className='NextContent__header'>
-            <div className='NextContent__post-descriptor-line'>
-            <a
-              className='NextContent__post-title-line'
-              href='#'
-              onClick={ noop }
-              target={ linkExternally ? '_blank' : null }
-            >
-              { title }
-            </a></div>
-            <a
-              className='NextContent__post-descriptor-line'
-              href='#'
-              onClick={ noop }
-              target={ linkExternally ? '_blank' : null }
-            >
-              { post.ups } upvotes in r/{ post.subreddit }
-            </a>
-          </header>
-        </div>
-      </article>
+    const content = (
+      <div className='NextContent__post-wrapper' onClick={ onClick }>
+        <PostContent
+          post={ postWithFallback }
+          single={ false }
+          compact={ true }
+          expandedCompact={ false }
+          onTapExpand={ function () {} }
+          width={ width }
+          toggleShowNSFW={ false }
+          showNSFW={ false }
+          editing={ false }
+          toggleEditing={ false }
+          saveUpdatedText={ false }
+          forceHTTPS={ this.forceHTTPS }
+          isDomainExternal={ this.externalDomain }
+          renderMediaFullbleed={ true }
+          showLinksInNewTab={ false }
+        />
+        <header className='NextContent__header'>
+          <div className='NextContent__post-descriptor-line'>
+          <a
+            className='NextContent__post-title-line'
+            href='#'
+            onClick={ noop }
+            target={ linkExternally ? '_blank' : null }
+          >
+            { title }
+          </a></div>
+          <a
+            className='NextContent__post-descriptor-line'
+            href='#'
+            onClick={ noop }
+            target={ linkExternally ? '_blank' : null }
+          >
+            { post.ups } upvotes in r/{ post.subreddit }
+          </a>
+        </header>
+      </div>
     );
+
+    return ({ dx }) => {
+      const translateX = `calc(${dx + offset*100}% + ${8*offset}px)`;
+      return (
+        <article
+          ref='rootNode'
+          className="Post NextContent__carousel-item"
+          key={ `${id}-${offset}` }
+          style={ { transform: `translate3d(${translateX}, 0, 0)` } }
+        >
+          { content }
+        </article>
+      );
+    };
   }
 
   renderNextPostCarousel(posts) {
@@ -355,6 +353,11 @@ export default class RelevantContent extends BaseComponent {
       swipeDistance: 50, // pixels
     });
 
+    const postMakers = postIndices.map(i => {
+      const postNum = mod(i, postCount);
+      return this.renderCarouselPost(posts[postNum], postNum, i);
+    });
+
     return (
       <Motion style={ { dx: spring(-100*carouselIndex) } }>
         { style => (
@@ -364,10 +367,7 @@ export default class RelevantContent extends BaseComponent {
             onSwipeRight={ onSwipeRight }
           >
             <div className='NextContent__drag-container'>
-              { postIndices.map(i => {
-                const postNum = mod(i, postCount);
-                return this.renderCarouselPost(posts[postNum], postNum, i, style);
-              }) }
+              { postMakers.map(f => f(style)) }
             </div>
           </Swipeable>
         ) }
@@ -444,19 +444,13 @@ export default class RelevantContent extends BaseComponent {
       const { displayBanner } = this.state;
 
       const { topLinks } = relevant;
-      // XXX rename some of these bindings
-      let post;
-      let i = 0;
-      while (!post && i < topLinks.length) {
-        const link = topLinks[i];
-        if (safeAndNew(link)) {
-          post = link;
-        }
-        i += 1;
-      }
+      const post = flow(
+        curryRight(filter)(null)(safeAndNew),
+        first
+      )(topLinks);
 
       if (!post) {
-        return;
+        return null;
       }
 
       const { width } = this.props;
