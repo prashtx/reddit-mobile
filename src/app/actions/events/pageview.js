@@ -1,8 +1,12 @@
 import { parseRoute } from '@r/platform/navigationMiddleware';
 
 import { NIGHTMODE } from 'app/actions/theme';
-
 import routes from 'app/router';
+
+import { NAME as Comments } from 'app/router/handlers/CommentsPage';
+import { NAME as Posts } from 'app/router/handlers/PostsFromSubreddit';
+import { NAME as Search} from 'app/router/handlers/SearchPage';
+import { searchRequestSelector  } from 'app/pages/SearchPage';
 
 import {
   getBasePayload,
@@ -13,57 +17,30 @@ import {
   //getThingFromStateById,
 } from './utils';
 
-//const LINK_LIMIT = 25;
+const LINK_LIMIT = 25;
 
-export function buildPageviewData (state) {
-  const { handler } = parseRoute(state.platform.currentPage.url, routes);
-  const handlerName = handler.name;
+// update with user activity once we have it
+const INCLUDE_SORT_ORDER = [Comments, Posts, Search];
+const SORT_TYPE_CONFIDENCE = [Comments];
 
-  if (!handlerName) {
-    return;
-  }
+export const buildSortOrderData = (state, handlerName) => {
+  const { currentPage } = state.platform;
+  const { queryParams } = currentPage;
 
-  console.log(handlerName);
+  const data = {};
 
-  const subreddit = getCurrentSubredditFromState(state);
-
-  //const post = getCurrentPostFromState(state);
-  //const user = getCurrentUserFromState(state); 
-
-  const data = {
-    ...getBasePayload(state),
-    language: 'en', // NOTE: update when there are translations
-    dnt: !!window.DO_NOT_TRACK,
-    compact_view: state.compact,
-  };
-
-  if (state.theme === NIGHTMODE) {
-    data.nightmode = true;
-  }
-
-  // If we're on a subreddit (or a post in a subreddit) , include the info in
-  // the payload
-  if (subreddit) {
-    data.sr_id = convertId(subreddit.name);
-    data.sr_name = subreddit.uuid;
-  }
-
-  /* figure out what we're looking at
-  // If we're looking at a list of links or comments, include the sort order
-  // (or a default). If it's just a list of links, not comments, also include
-  // the page size.
-  if (props.data.listings || props.data.search || props.data.activities || props.data.comments) {
-    if (props.ctx.query.sort === 'top') {
-      data.target_filter_time = props.ctx.query.time || 'all';
+  if (INCLUDE_SORT_ORDER.includes(handlerName)) {
+    if (currentPage.queryParams.sort === 'top') {
+      data.target_filter_time = queryParams.time || 'all';
     }
 
-    if (props.data.comments || props.data.activities) {
-      data.target_sort = props.ctx.query.sort || 'confidence';
+    if (SORT_TYPE_CONFIDENCE.includes(handlerName)) {
+      data.target_sort = queryParams.sort || 'confidence';
     } else {
-      data.target_sort = props.ctx.query.sort || 'hot';
+      data.target_sort = queryParams.sort || 'hot';
       data.target_count = LINK_LIMIT;
 
-      const query = props.ctx.query;
+      const query = queryParams;
       if (query.before) {
         data.target_before = query.before;
       }
@@ -73,16 +50,58 @@ export function buildPageviewData (state) {
       }
     }
 
-    if (props.data.search && props.ctx.query.q) {
-      data.query_string = props.ctx.query.q;
-      data.query_string_length = props.ctx.query.q.length;
-    }
+    if (handlerName === Search) {
+      const request = searchRequestSelector(state);
 
-    if (props.data.search) {
-      data.sr_listing = props.data.search.subreddits.map(sr => sr.display_name);
+      if (queryParams.q) {
+        data.query_string = queryParams.q;
+        data.query_string_length = queryParams.q.length;
+      }
+
+      data.sr_listing = request.subreddits.map(sr => state.subreddits[sr.uuid].displayName);
       data.target_type = 'search_results';
     }
   }
+
+  return data;
+};
+
+export const buildSubredditData = (state) => {
+  const subreddit = getCurrentSubredditFromState(state);
+
+  if (subreddit) {
+    return {
+      sr_id: convertId(subreddit.name),
+      sr_name: subreddit.uuid,
+    };
+  }
+
+  return {};
+};
+
+export const buildLanguageData = () => {
+  return { language: 'en' };
+};
+
+export const buildDNTData = () => {
+  return { dnt: !!window.DO_NOT_TRACK };
+};
+
+export const buildCompactViewData = (state) => {
+  return { compact_view: state.compact };
+};
+
+export const buildNightModeData = (state) => {
+  if (state.theme === NIGHTMODE) {
+    return { nightmode: true };
+  }
+
+  return {};
+};
+
+export const buildTargetData = (/*state, handlerName*/) => {
+  /*
+  let target;
 
   // Try looking at the data to determine what the subject of the page is.
   // In order of priority, it could be a user profile, a listing, or a
@@ -141,21 +160,62 @@ export function buildPageviewData (state) {
     }
   }
   */
+  return {};
+};
+
+export const dataRequiredForHandler = (state, handlerName) => {
+  if (!waitForUser(state)) { return; }
+
+  switch (handlerName) {
+    case Comments: {
+      return true;
+      // subredditRequests and posts and comments
+      // return state.commentsPages && state.subredditRequests && state.posts;
+    }
+    case Search: {
+      const request = searchRequestSelector(state);
+      return request && !request.loading;
+    }
+    case Posts: {
+      console.log('returning true for posts');
+      return true;
+      // subredditRequests and postsLists
+      // return state.postsLists && state.subredditRequests;
+    }
+    default: {
+      return true;
+    }
+  }
+};
+
+export const buildPageviewData = (state, handlerName) => {
+  const data = {
+    ...getBasePayload(state),
+    ...buildSortOrderData(state, handlerName),
+    ...buildSubredditData(state),
+    ...buildLanguageData(state),
+    ...buildDNTData(state),
+    ...buildCompactViewData(state),
+    ...buildTargetData(state, handlerName),
+  };
 
   return data;
-}
+};
+
+export const waitForUser = (state) => {
+  if (!state.session.isValid) { return true; }
+  return state.user.name && state.accounts[state.user.name];
+};
 
 export const EVENT__PAGEVIEW = 'EVENT__PAGEVIEW';
 export const pageview = () => async (dispatch, getState, { waitForState }) => {
-  let state = getState();
+  const currentState = getState();
 
-  if (state.session.isValid) {
-    return await waitForState(state => state.user.name && state.accounts[state.user.name], () => {
-      state = getState();
-      console.log('PAGEVIEW', buildPageviewData(state));
-    });
-  }
+  const { currentPage } = currentState.platform;
+  const { handler } = parseRoute(currentPage.url, routes);
+  const handlerName = handler.name;
 
-  const data = buildPageviewData(state);
-  console.log('PAGEVIEW', data);
+  return await waitForState((state) => (dataRequiredForHandler(getState(), handlerName)), () => {
+    console.log('PAGEVIEW', buildPageviewData(getState(), handlerName));
+  });
 };

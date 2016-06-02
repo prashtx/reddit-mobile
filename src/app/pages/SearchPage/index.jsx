@@ -245,9 +245,9 @@ const _SearchPage = (props) => {
   );
 };
 
-const pageDataSelector = state => state.platform.currentPage;
+export const pageDataSelector = state => state.platform.currentPage;
 
-const searchRequestSelector = state => {
+export const searchRequestSelector = state => {
   const pageData = pageDataSelector(state);
   const requestParams = SearchPageHandler.pageParamsToSearchRequestParams(pageData);
   const requestId = paramsToSearchRequestId(requestParams);

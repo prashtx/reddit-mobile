@@ -5,7 +5,11 @@ import Session from 'app/models/Session';
 import * as sessionActions from 'app/actions/session';
 import * as loginActions from 'app/actions/login';
 
+export const NAME = 'Login';
+
 export default class Login extends BaseHandler {
+  name = NAME;
+
   async [METHODS.GET](/*dispatch, getState, utils*/) {
     return;
   }

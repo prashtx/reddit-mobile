@@ -28,8 +28,8 @@ export function getBasePayload(state) {
     payload.user_name = user.name;
     payload.user_id = convertId(user.id);
   } else {
-    payload.loid = state.loid;
-    payload.loid_created = state.loidcreated;
+    payload.loid = state.loid.loid;
+    payload.loid_created = state.loid.loidcreated;
   }
 
   return payload;
@@ -75,7 +75,7 @@ export function getThingFromStateById (state, id) {
 export async function waitForValidSession(state, waitForState, cb) {
   if (state.session.isValid) {
     return await waitForState(state => state.user.name && state.accounts[state.user.name], cb);
-  } else {
-    cb(state);
   }
+
+  cb(state);
 }

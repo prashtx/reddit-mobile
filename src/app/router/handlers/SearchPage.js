@@ -46,7 +46,11 @@ const removeDefaultables = (params) => {
   return newObject;
 };
 
+export const NAME = 'SearchPage';
+
 export default class SearchPage extends BaseHandler {
+  name = NAME;
+
   static pageParamsToSearchRequestParams({ urlParams, queryParams }) {
     const { q, after, before } = queryParams;
     const sort = getDefaultable(SORT, queryParams);
