@@ -2,8 +2,7 @@ import { buildPageviewData } from './pageview';
 import { waitForValidSession } from './utils';
 
 import { NAME as Search} from 'app/router/handlers/SearchPage';
-import { searchRequestSelector  } from 'app/pages/SearchPage';
-import { dataRequiredForHandler  } from 'app/actions/events/pageview';
+import { dataRequiredForHandler } from 'app/actions/events/pageview';
 
 const SEARCH_EXECUTED = 'search_executed';
 const SEARCH_CANCELLED = 'search_cancelled';
@@ -35,7 +34,7 @@ export function buildSearchData(state, params, response) {
 export const EVENT__SEARCH_EXECUTED = 'EVENT__SEARCH_EXECUTED';
 export const executed = (params, response) =>
   async (dispatch, getState, { waitForState }) => {
-    return await waitForState(() => (dataRequiredForHandler(getState(), Search)), () => {
+    return await waitForState((state) => (dataRequiredForHandler(state, Search)), () => {
       const data = buildSearchData(getState(), params, response);
       data.type = SEARCH_EXECUTED;
       console.log('SEARCH_EXECUTED', data);
