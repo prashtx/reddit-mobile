@@ -1,3 +1,4 @@
+/* eslint callback-return: "off" */
 import * as platform from '@r/platform/actions';
 
 import * as search from 'app/actions/search';

@@ -6,7 +6,7 @@ import routes from 'app/router';
 import { NAME as Comments } from 'app/router/handlers/CommentsPage';
 import { NAME as Posts } from 'app/router/handlers/PostsFromSubreddit';
 import { NAME as Search} from 'app/router/handlers/SearchPage';
-import { searchRequestSelector  } from 'app/pages/SearchPage';
+import { searchRequestSelector } from 'app/pages/SearchPage';
 
 import {
   getBasePayload,
@@ -215,7 +215,7 @@ export const pageview = () => async (dispatch, getState, { waitForState }) => {
   const { handler } = parseRoute(currentPage.url, routes);
   const handlerName = handler.name;
 
-  return await waitForState((state) => (dataRequiredForHandler(getState(), handlerName)), () => {
+  return await waitForState((state) => (dataRequiredForHandler(state, handlerName)), () => {
     console.log('PAGEVIEW', buildPageviewData(getState(), handlerName));
   });
 };
