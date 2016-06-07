@@ -80,6 +80,13 @@ export const BANNER_URLS_DIRECT = {
 export const flags = {
   BETA: 'beta',
   SMARTBANNER: 'banner',
+  VARIANT_RELEVANCY_TOP: 'experimentRelevancyTop',
+  VARIANT_RELEVANCY_ENGAGING: 'experimentRelevancyEngaging',
+  VARIANT_RELEVANCY_RELATED: 'experimentRelevancyRelated',
+  VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
+  VARIANT_NEXTCONTENT_MIDDLE: 'experimentNextContentMiddle',
+  VARIANT_NEXTCONTENT_BANNER: 'experimentNextContentBanner',
+  VARIANT_NEXTCONTENT_TOP3: 'experimentNextContentTop3',
 };
 
 export const themes = {
