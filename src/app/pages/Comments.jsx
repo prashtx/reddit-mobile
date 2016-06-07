@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
+import features from 'app/featureFlags';
+
 import CommentsList from 'app/components/CommentsList';
 import CommentsPageTools from 'app/components/CommentsPage/CommentsPageTools';
 import Post from 'app/components/Post';
@@ -10,13 +12,16 @@ import SubNav from 'app/components/SubNav';
 
 import CommentsPageHandler from 'app/router/handlers/CommentsPage';
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
+import { paramsToPostsListsId } from 'app/models/PostsList';
 
 const commentsPageSelector = createSelector(
   (state, props) => props,
   (state) => state.commentsPages,
   (state) => state.posts,
   (state) => state.platform.currentPage,
-  (pageProps, commentsPages, posts, currentPage) => {
+  (state) => features.withContext({ state }),
+  (state) => state.postsLists,
+  (pageProps, commentsPages, posts, currentPage, feature, postsLists) => {
     const commentsPageParams = CommentsPageHandler.PageParamsToCommentsPageParams(pageProps);
     const commentsPageId = paramsToCommentsPageId(commentsPageParams);
     const commentsPage = commentsPages[commentsPageId];
@@ -29,6 +34,15 @@ const commentsPageSelector = createSelector(
 
     const replying = currentPage.queryParams.commentReply === commentsPageParams.id;
 
+    const { subredditName } = commentsPageParams;
+    const postsParams = {
+      subredditName,
+    };
+    const postsListId = paramsToPostsListsId(postsParams);
+    const postsList = postsLists[postsListId];
+
+    const topPosts = (!postsList || postsList.loading) ? [] : postsList.results;
+
     return {
       postLoaded,
       commentsPageParams,
@@ -38,9 +52,17 @@ const commentsPageSelector = createSelector(
       topLevelComments,
       currentPage,
       replying,
+      feature,
+      topPosts,
     };
   },
 );
+
+const NextContent = (props) => {
+  return (
+    <div>{ props.posts.map(post => (<div>{ post.uuid }</div>)) }</div>
+  );
+};
 
 export const CommentsPage = connect(commentsPageSelector)((props) => {
   const {
@@ -51,6 +73,8 @@ export const CommentsPage = connect(commentsPageSelector)((props) => {
     postLoaded,
     currentPage,
     replying,
+    feature,
+    topPosts,
   } = props;
 
   return (
@@ -66,6 +90,9 @@ export const CommentsPage = connect(commentsPageSelector)((props) => {
             id={ commentsPageParams.id }
           />,
         ]
+      }
+      { feature.enabled('foo') ?
+        <NextContent posts={ topPosts }/> : <div>No foo.</div>
       }
 
       { !commentsPage || commentsPage.loading ?

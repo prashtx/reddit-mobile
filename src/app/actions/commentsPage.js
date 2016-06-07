@@ -1,9 +1,14 @@
+import { some } from 'lodash/collection';
+
 import { apiOptionsFromState } from 'lib/apiOptionsFromState';
+import features from 'app/featureFlags';
 import { endpoints } from '@r/api-client';
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
 import { receivedResponse } from './apiResponse';
+import { paramsToPostsListsId } from 'app/models/PostsList';
+import { fetchingSubredditPosts, receivedPostList } from 'app/actions/postsList';
 
-const { CommentsEndpoint } = endpoints;
+const { CommentsEndpoint, PostsEndpoint } = endpoints;
 
 export const FETCHING_COMMENTS_PAGE = 'FETCHING_COMMENTS_PAGE';
 
@@ -36,5 +41,61 @@ export const fetchCommentsPage = commentsPageParams => async (dispatch, getState
   const apiOptions = apiOptionsFromState(state);
   const apiResponse = await CommentsEndpoint.get(apiOptions, commentsPageParams);
   dispatch(receivedResponse(apiResponse));
+
   dispatch(receivedCommentsPage(commentsPageId, apiResponse.results));
 };
+
+function canGetSubreddit(state) {
+  if (state.platform.currentPage.urlParams.subredditName) {
+    return true;
+  }
+
+  const { commentsPages } = state;
+  if (!commentsPages) {
+    return false;
+  }
+
+  const { current } = commentsPages;
+  if (!current) {
+    return false;
+  }
+
+  return some(commentsPages[current].results, result =>
+    state.comments[result.uuid] && !!state.comments[result.uuid].subreddit);
+}
+
+function getSubreddit(state) {
+  if (state.platform.currentPage.urlParams.subredditName) {
+    return state.platform.currentPage.urlParams.subredditName;
+  }
+
+  const { commentsPages } = state;
+  const { current } = commentsPages;
+  return state.comments[commentsPages[current].results[0].uuid].subreddit;
+}
+
+export const fetchRelevantContent =
+  () => async (dispatch, getState, { waitForState }) => {
+    await waitForState(canGetSubreddit, async () => {
+      const state = getState();
+      const feature = features.withContext({ state });
+      const subredditName = getSubreddit(state);
+      if (feature.enabled('foo')) {
+        console.log('fetching posts'); // XXX
+        const postsParams = {
+          subredditName,
+        };
+        const postsListId = paramsToPostsListsId(postsParams);
+        const postsList = state.postsLists[postsListId];
+
+        if (!postsList) {
+          dispatch(fetchingSubredditPosts(postsListId, postsParams));
+          const apiOptions = apiOptionsFromState(state);
+          const apiResponse = await PostsEndpoint.get(apiOptions, postsParams);
+          dispatch(receivedResponse(apiResponse));
+          dispatch(receivedPostList(postsListId, apiResponse.results));
+        // const postsResponse = await PostsEndpoint.get(apiOptions, { subredditName: 'gaming'});
+        }
+      }
+    });
+  };
