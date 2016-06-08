@@ -1,8 +1,3 @@
-import { createSelector } from 'reselect';
-import features from 'featureFlags';
+import features from 'app/featureFlags';
 
-export const featuresSelector = createSelector(
-  (state) => features.withContext({ state }),
-  (feature) => (feature),
-);
-
+export const featuresSelector = (state) => features.withContext({ state });

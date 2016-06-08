@@ -1,25 +1,36 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { some } from 'lodash/collection';
 
-import features from 'app/featureFlags';
+import { flags } from 'app/constants';
+import { featuresSelector } from 'app/selectors/features';
 
 import CommentsList from 'app/components/CommentsList';
 import CommentsPageTools from 'app/components/CommentsPage/CommentsPageTools';
 import Post from 'app/components/Post';
 import Loading from 'app/components/Loading';
 import SubNav from 'app/components/SubNav';
+import RelevantContent from 'app/components/RelevantContent';
 
 import CommentsPageHandler from 'app/router/handlers/CommentsPage';
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
 import { paramsToPostsListsId } from 'app/models/PostsList';
+
+const {
+  // XXX VARIANT_RELEVANCY_TOP,
+  VARIANT_NEXTCONTENT_TOP3,
+  VARIANT_NEXTCONTENT_BANNER,
+  VARIANT_NEXTCONTENT_BOTTOM,
+  VARIANT_NEXTCONTENT_MIDDLE,
+} = flags;
 
 const commentsPageSelector = createSelector(
   (state, props) => props,
   (state) => state.commentsPages,
   (state) => state.posts,
   (state) => state.platform.currentPage,
-  (state) => features.withContext({ state }),
+  featuresSelector,
   (state) => state.postsLists,
   (pageProps, commentsPages, posts, currentPage, feature, postsLists) => {
     const commentsPageParams = CommentsPageHandler.PageParamsToCommentsPageParams(pageProps);
@@ -58,13 +69,11 @@ const commentsPageSelector = createSelector(
   },
 );
 
-const NextContent = (props) => {
-  return (
-    <div>{ props.posts.map(post => (<div>{ post.uuid }</div>)) }</div>
-  );
-};
+const mapDispatchToProps = (dispatch, { commentId }) => ({
+  unabbreviateComments: () => dispatch(commentActions.unabbreviateComments()),
+});
 
-export const CommentsPage = connect(commentsPageSelector)((props) => {
+export const CommentsPage = connect(commentsPageSelector, mapDispatchToProps)((props) => {
   const {
     commentsPage,
     commentsPageParams,
@@ -91,8 +100,14 @@ export const CommentsPage = connect(commentsPageSelector)((props) => {
           />,
         ]
       }
-      { feature.enabled('foo') ?
-        <NextContent posts={ topPosts }/> : <div>No foo.</div>
+
+      { feature.enabled(VARIANT_NEXTCONTENT_MIDDLE) &&
+        <RelevantContent
+          listingId={ commentsPageParams.id }
+          subreddit={ {} }
+          subredditName='someSubredditWooHoo'
+          posts={ topPosts }
+        />
       }
 
       { !commentsPage || commentsPage.loading ?
@@ -102,6 +117,20 @@ export const CommentsPage = connect(commentsPageSelector)((props) => {
           permalinkBase={ permalinkBase }
           className={ 'CommentsList__topLevel' }
         /> }
+
+      { some([
+        'foo',
+        VARIANT_NEXTCONTENT_TOP3,
+        VARIANT_NEXTCONTENT_BANNER,
+        VARIANT_NEXTCONTENT_BOTTOM,
+      ], x => feature.enabled(x)) &&
+        <RelevantContent
+          listingId={ commentsPageParams.id }
+          subreddit={ {} }
+          subredditName='someSubredditWooHoo'
+          posts={ topPosts }
+        />
+      }
     </div>
   );
 });

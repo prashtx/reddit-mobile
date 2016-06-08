@@ -7,8 +7,13 @@ import { paramsToCommentsPageId } from 'app/models/CommentsPage';
 import { receivedResponse } from './apiResponse';
 import { paramsToPostsListsId } from 'app/models/PostsList';
 import { fetchingSubredditPosts, receivedPostList } from 'app/actions/postsList';
+import { flags } from 'app/constants';
 
 const { CommentsEndpoint, PostsEndpoint } = endpoints;
+
+const {
+  VARIANT_NEXTCONTENT_TOP3,
+} = flags;
 
 export const FETCHING_COMMENTS_PAGE = 'FETCHING_COMMENTS_PAGE';
 
@@ -80,7 +85,8 @@ export const fetchRelevantContent =
       const state = getState();
       const feature = features.withContext({ state });
       const subredditName = getSubreddit(state);
-      if (feature.enabled('foo')) {
+      console.log('OK! subredditName: ', subredditName); //XXX
+      if (some([VARIANT_NEXTCONTENT_TOP3], variant => feature.enabled(variant))) {
         console.log('fetching posts'); // XXX
         const postsParams = {
           subredditName,

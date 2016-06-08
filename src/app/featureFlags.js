@@ -55,7 +55,7 @@ const config = {
       variant: 'nextcontent_mweb:bottom',
       loggedin: false,
     }],
-  }, // XXX
+  },
   [VARIANT_NEXTCONTENT_MIDDLE]: {
     url: 'experimentnextcontentmiddle',
     subreddit: 'pic',
@@ -63,7 +63,7 @@ const config = {
       variant: 'nextcontent_mweb:middle',
       loggedin: false,
     }],
-  }, // XXX
+  },
   [VARIANT_NEXTCONTENT_BANNER]: {
     url: 'experimentnextcontentbanner',
     subreddit: 'pics',
@@ -71,15 +71,18 @@ const config = {
       variant: 'nextcontent_mweb:banner',
       loggedin: false,
     }],
-  }, // XXX
+  },
   [VARIANT_NEXTCONTENT_TOP3]: {
-    url: 'experimentnextcontenttop3',
+    or: [
+      { url: 'experimentnextcontenttop3' },
+      { url: 'top3' },
+    ],
     subreddit: 'woodworking',
     and: [{
       variant: 'nextcontent_mweb:top3',
       loggedin: false,
     }],
-  }, // XXX
+  },
 };
 
 const flags = new Flags(config);
@@ -101,17 +104,14 @@ flags.addRule('users', function(users) {
   return users.includes(user.name);
 });
 
-// XXX
 flags.addRule('employee', function(val) {
   return extractUser(this).is_employee === val;
 });
 
-// XXX
 flags.addRule('admin', function(val) {
   return extractUser(this).is_admin === val;
 });
 
-// XXX
 flags.addRule('beta', function(val) {
   return extractUser(this).is_beta === val;
 });
@@ -148,18 +148,37 @@ flags.addRule('or', (function (flags) {
   };
 })(flags));
 
-// XXX
+// XXX consolidate with actions/commentsPage
+function getSubreddit(state) {
+  if (state.platform.currentPage.urlParams.subredditName) {
+    return state.platform.currentPage.urlParams.subredditName;
+  }
+
+  const { commentsPages = {}} = state;
+  const { current } = commentsPages;
+  if (!current) { return; }
+  const results = commentsPages[current].results;
+  if (!results || results.length === 0) { return; }
+  const comment = state.comments[results[0].uuid];
+  if (!comment) { return; }
+  return comment.subreddit;
+}
+
 flags.addRule('subreddit', function (name) {
-  // XXX For the various page types that could be "within a subreddit", check
-  // the current page of that type in the state.
-  return this.props.subredditName && this.props.subredditName.toLowerCase() === name.toLowerCase();
+  const subreddit = getSubreddit(this.state);
+  if (!subreddit) {
+    return false;
+  }
+
+  return subreddit.toLowerCase() === name.toLowerCase();
 });
 
 flags.addRule('variant', function (name) {
   const [experiment_name, checkedVariant] = name.split(':');
   const user = extractUser(this);
   if (user && user.features && user.features[experiment_name]) {
-    const { variant, experiment_id } = user.features[experiment_name];
+    const { variant } = user.features[experiment_name];
+    // const { variant, experiment_id } = user.features[experiment_name];
 
     // XXX
     // // Fire bucketing event.
