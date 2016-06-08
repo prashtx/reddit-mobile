@@ -58,6 +58,8 @@ export const DEFAULT_KEY_COLOR = '#336699';
 
 export const SET_META_COLOR = 'setMetaColor';
 
+export const VISITED_POSTS_KEY = 'visitedPosts';
+
 // Post content
 
 export const POST_COMPACT_THUMBNAIL_WIDTH = 70;
