@@ -1,5 +1,7 @@
 import Flags from '@r/flags';
 
+import getSubreddit from 'lib/getSubredditFromState';
+
 import { flags as flagConstants } from './constants';
 
 const {
@@ -121,48 +123,6 @@ flags.addRule('url', function(query) {
   const parsedQuery = Flags.parseConfig(this.state.platform.currentPage.queryParams);
   return Object.keys(parsedQuery).includes(query);
 });
-
-// XXX
-flags.addRule('and', (function (flags) {
-  return function (config) {
-    return Object.keys(config).every(rule => {
-      if (!flags.rules[rule]) {
-        return false;
-      }
-      return flags.rules[rule].call(this, config[rule]);
-    });
-  };
-})(flags));
-
-// XXX
-// OR is the default behavior, but we can't have multiple AND rules (or
-// multiples of any rule type, or nested ORs with an AND) without an explicit
-// OR
-flags.addRule('or', (function (flags) {
-  return function (config) {
-    return config.some(subConfig =>
-      Object.keys(subConfig).some(rule =>
-        !flags.rules[rule] ? false : flags.rules[rule].call(this, subConfig[rule])
-      )
-    );
-  };
-})(flags));
-
-// XXX consolidate with actions/commentsPage
-function getSubreddit(state) {
-  if (state.platform.currentPage.urlParams.subredditName) {
-    return state.platform.currentPage.urlParams.subredditName;
-  }
-
-  const { commentsPages = {}} = state;
-  const { current } = commentsPages;
-  if (!current) { return; }
-  const results = commentsPages[current].results;
-  if (!results || results.length === 0) { return; }
-  const comment = state.comments[results[0].uuid];
-  if (!comment) { return; }
-  return comment.subreddit;
-}
 
 flags.addRule('subreddit', function (name) {
   const subreddit = getSubreddit(this.state);
