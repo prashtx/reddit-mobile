@@ -16,13 +16,10 @@ import RelevantContent from 'app/components/RelevantContent';
 import CommentsPageHandler from 'app/router/handlers/CommentsPage';
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
 import { paramsToPostsListsId } from 'app/models/PostsList';
+import { unabbreviateComments } from 'app/actions/commentsPage';
 
 const {
-  // XXX VARIANT_RELEVANCY_TOP,
-  VARIANT_NEXTCONTENT_TOP3,
-  VARIANT_NEXTCONTENT_BANNER,
   VARIANT_NEXTCONTENT_BOTTOM,
-  VARIANT_NEXTCONTENT_MIDDLE,
 } = flags;
 
 const commentsPageSelector = createSelector(
@@ -69,11 +66,7 @@ const commentsPageSelector = createSelector(
   },
 );
 
-const mapDispatchToProps = (dispatch, { commentId }) => ({
-  unabbreviateComments: () => dispatch(commentActions.unabbreviateComments()),
-});
-
-export const CommentsPage = connect(commentsPageSelector, mapDispatchToProps)((props) => {
+export const CommentsPage = connect(commentsPageSelector)((props) => {
   const {
     commentsPage,
     commentsPageParams,
@@ -101,15 +94,6 @@ export const CommentsPage = connect(commentsPageSelector, mapDispatchToProps)((p
         ]
       }
 
-      { feature.enabled(VARIANT_NEXTCONTENT_MIDDLE) &&
-        <RelevantContent
-          listingId={ commentsPageParams.id }
-          subreddit={ {} }
-          subredditName='someSubredditWooHoo'
-          posts={ topPosts }
-        />
-      }
-
       { !commentsPage || commentsPage.loading ?
         <Loading /> :
         <CommentsList
@@ -119,9 +103,7 @@ export const CommentsPage = connect(commentsPageSelector, mapDispatchToProps)((p
         /> }
 
       { some([
-        'foo',
-        VARIANT_NEXTCONTENT_TOP3,
-        VARIANT_NEXTCONTENT_BANNER,
+        'foo', // XXX
         VARIANT_NEXTCONTENT_BOTTOM,
       ], x => feature.enabled(x)) &&
         <RelevantContent

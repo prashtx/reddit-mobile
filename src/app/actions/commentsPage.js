@@ -12,7 +12,7 @@ import { flags } from 'app/constants';
 const { CommentsEndpoint, PostsEndpoint } = endpoints;
 
 const {
-  VARIANT_NEXTCONTENT_TOP3,
+  VARIANT_NEXTCONTENT_BOTTOM,
 } = flags;
 
 export const FETCHING_COMMENTS_PAGE = 'FETCHING_COMMENTS_PAGE';
@@ -86,7 +86,7 @@ export const fetchRelevantContent =
       const feature = features.withContext({ state });
       const subredditName = getSubreddit(state);
       console.log('OK! subredditName: ', subredditName); //XXX
-      if (some([VARIANT_NEXTCONTENT_TOP3], variant => feature.enabled(variant))) {
+      if (some([VARIANT_NEXTCONTENT_BOTTOM], variant => feature.enabled(variant))) {
         console.log('fetching posts'); // XXX
         const postsParams = {
           subredditName,
