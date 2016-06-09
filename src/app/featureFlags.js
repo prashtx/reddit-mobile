@@ -50,7 +50,7 @@ const config = {
   },
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
-    subreddit: 'images',
+    subreddit: 'aww',
     and: [{
       variant: 'nextcontent_mweb:bottom',
       loggedin: false,

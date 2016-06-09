@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { models } from '@r/api-client';
 
-import { filter, some } from 'lodash/collection';
-import { take } from 'lodash/array';
+import filter from 'lodash/fp/filter';
+import first from 'lodash/fp/first';
+import flow from 'lodash/fp/flow';
 
 import localStorageAvailable from 'lib/localStorageAvailable';
+import mobilify from 'lib/mobilify';
 
 import { featuresSelector } from 'app/selectors/features';
 import { flags, VISITED_POSTS_KEY } from 'app/constants';
@@ -17,26 +19,15 @@ import PostContent from 'app/components/Post/PostContent';
 
 import {
   isPostDomainExternal,
+  cleanPostHREF,
 } from 'app/components/Post/postUtils';
 
 const { PostModel } = models;
-// XXX
-//
-//import {
-//  isPostDomainExternal,
-//  postShouldRenderMediaFullbleed,
-//} from './postUtils';
-//
-//import PostHeader from './PostHeader';
-//import PostContent from './PostContent';
-//import PostFooter from './PostFooter';
 
 const {
-  VARIANT_RELEVANCY_TOP,
-  VARIANT_NEXTCONTENT_TOP3,
+  VARIANT_NEXTCONTENT_BOTTOM,
 } = flags;
 
-const NUM_TOP_LINKS = 3;
 
 const T = React.PropTypes;
 
@@ -60,92 +51,10 @@ RelevantContent.defaultProps = {
   winWidth: 360,
 };
 
-function renderPostList(props) {
-  const { winWidth, posts, feature } = props;
+function NextPost(props) {
+  const { topLinks, width, listingId } = props;
 
-  // let makeOnClick;
-  // if (feature.enabled(VARIANT_RELEVANCY_TOP)) {
-  //   makeOnClick = (url, name, i) => (
-  //     e => this.goToRelevancyPost(e, { url, id: name, linkIndex: i + 1 })
-  //   );
-  // } else if (feature.enabled(VARIANT_NEXTCONTENT_TOP3)) {
-  //   makeOnClick = (url, name, i) => (
-  //     e => this.goToNextContentPost(e, { url, id: name, linkIndex: i + 1 })
-  //   );
-  // }
-
-  const hasThumbs = some(posts, post => !!post.thumbnail && post.thumbnail !== '');
-
-  return posts.map((post, i) => {
-    const linkExternally = post.disable_comments;
-    const externalDomain = isPostDomainExternal(post);
-    // XXX const url = cleanPostHREF(mobilify(linkExternally ? post.url : post.cleanPermalink));
-    const url = post.url;
-    const { id, title, name } = post;
-    // Make sure we always have an image to show
-    // Link to the comment thread instead of external content
-    const postWithFallback = {
-      preview: {},
-      ...post,
-      thumbnail: post.thumbnail || 'img/placeholder-thumbnail.svg',
-      cleanUrl: '#',
-    };
-    // XXX const onClick = makeOnClick(url, name, i);
-    const noop = (e => e.preventDefault());
-    const onClick = noop;
-    return (
-      <article ref='rootNode' className={ `Post ${hasThumbs ? '' : 'no-thumbs'}` } key={ id }>
-        <div className='Post__header-wrapper' onClick={ onClick }>
-          <PostContent
-            post={ postWithFallback }
-            single={ false }
-            compact={ true }
-            expandedCompact={ false }
-            onTapExpand={ function () {} }
-            width={ winWidth }
-            toggleShowNSFW={ false }
-            showNSFW={ false }
-            editing={ false }
-            forceHTTPS={ true }
-            isDomainExternal={ externalDomain }
-            renderMediaFullbleed={ true }
-            showLinksInNewTab={ false }
-          />
-          <header className='PostHeader size-compact m-thumbnail-margin'>
-            <div className='PostHeader__post-descriptor-line-overflow'>
-            <a
-              className={ `PostHeader__post-title-line-blue ${post.visited ? 'm-visited' : ''}` }
-              href='#'
-              onClick={ noop }
-              target={ linkExternally ? '_blank' : null }
-            >
-              { title }
-            </a></div>
-            <a
-              className='PostHeader__post-title-line'
-              href='#'
-              onClick={ noop }
-              target={ linkExternally ? '_blank' : null }
-            >
-              { post.ups } upvotes in r/{ post.subreddit }
-            </a>
-          </header>
-        </div>
-      </article>
-    );
-  });
-}
-
-function RelevantContent(props) {
-  const {
-    feature,
-    subredditName,
-    subreddit,
-    listingId,
-    winWidth,
-    topLinks,
-  } = props;
-
+  // XXX move into a helper
   let visited = [];
   if (localStorageAvailable()) {
     const visitedString = localStorage.getItem(VISITED_POSTS_KEY);
@@ -160,51 +69,120 @@ function RelevantContent(props) {
     !link.stickied &&
     (visited.indexOf(link.id) === -1));
 
-  const safe = (link =>
-      !link.over_18 &&
-      link.id !== listingId &&
-      !link.stickied);
+  const post = flow(
+    filter(safeAndNew),
+    first
+  )(topLinks);
 
-  if (feature.enabled(VARIANT_RELEVANCY_TOP) ||
-      feature.enabled(VARIANT_NEXTCONTENT_TOP3)) {
-    // Show top posts from this subreddit
-    const predicate = feature.enabled(VARIANT_NEXTCONTENT_TOP3) ? safeAndNew : safe;
-    const links = take(filter(topLinks, predicate), NUM_TOP_LINKS);
+  if (!post) {
+    return null;
+  }
 
-    if (links.length === 0) { return; }
+  const linkExternally = post.disable_comments;
+  const url = cleanPostHREF(mobilify(linkExternally ? post.url : post.cleanPermalink));
+  const { id, title, name } = post;
+  // Make sure we always have an image to show
+  // Link to the comment thread instead of external content
+  const postWithFallback = {
+    preview: {},
+    ...post,
+    thumbnail: post.thumbnail || 'img/placeholder-thumbnail.svg',
+    cleanUrl: '#',
+  };
+  // const onClick = (e => this.goToNextContentPost(e, { url, id: name, linkIndex: 0 }));
+  // XXX
+  const onClick = (e => {
+    e.preventDefault();
+    console.log(name, url);
+  });
+  const noop = (e => e.preventDefault());
 
-    const postList = renderPostList({
-      winWidth,
-      feature,
-      posts: links,
-    });
+  const variant = 'bottom';
+  const descriptor = (
+    <a
+      className='PostHeader__post-descriptor-line'
+      href='#'
+      onClick={ noop }
+      target={ linkExternally ? '_blank' : null }
+    >
+      { post.ups } upvotes in r/{ post.subreddit }
+    </a>
+  );
+  const actionText = 'NEXT';
 
-    const onActionClick = function () {};
-    // const onActionClick = (e => this.goToSubreddit(e, {
-    //   url: subreddit.url,
-    //   id: subreddit.id,
-    //   name: subreddit.title,
-    //   linkName: 'top 25 posts',
-    //   linkIndex: NUM_TOP_LINKS + 1,
-    // }));
+  const externalDomain = isPostDomainExternal(postWithFallback);
+
+  return (
+    <div
+      className={ `NextContent container ${variant}` }
+      key='nextcontent-container'
+      onClick={ onClick }
+    >
+      <article ref='rootNode' className='Post' key={ id }>
+        <div className='NextContent__post-wrapper'>
+          <PostContent
+            post={ postWithFallback }
+            single={ false }
+            compact={ true }
+            expandedCompact={ false }
+            onTapExpand={ function () {} }
+            width={ width }
+            toggleShowNSFW={ false }
+            showNSFW={ false }
+            editing={ false }
+            toggleEditing={ false }
+            saveUpdatedText={ false }
+            forceHTTPS={ true }
+            isDomainExternal={ externalDomain }
+            renderMediaFullbleed={ true }
+            showLinksInNewTab={ false }
+          />
+          <header className='NextContent__header'>
+            <div className='NextContent__post-descriptor-line'>
+            <a
+              className='NextContent__post-title-line'
+              href='#'
+              onClick={ noop }
+              target={ linkExternally ? '_blank' : null }
+            >
+              { title }
+            </a></div>
+            { descriptor }
+          </header>
+        </div>
+        <div className='NextContent__next-link'>
+          <a
+            href='#'
+            onClick={ noop }
+          >
+            { actionText }
+            <span className='icon-nav-arrowforward icon'></span>
+          </a>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function RelevantContent(props) {
+  const {
+    feature,
+    listingId,
+    winWidth,
+    topLinks,
+  } = props;
+
+  if (feature.enabled(VARIANT_NEXTCONTENT_BOTTOM)) {
+    if (topLinks.length === 0) {
+      return null;
+    }
 
     return (
-      <div className='RelevantContent container' key='relevant-container'>
-        <div className='RelevantContent-header'>
-          <span className='RelevantContent-row-spacer'>
-            <span className='RelevantContent-icon icon-bar-chart orangered-circled'></span>
-          </span>
-          <span className='RelevantContent-row-text'>Top Posts in r/{ subredditName }</span>
-        </div>
-        { postList }
-        <a
-          className='RelevantContent-action'
-          href='#'
-          onClick={ onActionClick }
-        >
-            See top 25 Posts
-        </a>
-      </div>
+      <NextPost
+        topLinks={ topLinks }
+        width={ winWidth }
+        listingId={ listingId }
+      />
     );
   }
 }
