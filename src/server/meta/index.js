@@ -1,3 +1,5 @@
+import { isString } from 'lodash/lang';
+
 const appleAppSiteAssociation = JSON.stringify({
   activitycontinuation: {
     apps: [
@@ -24,7 +26,7 @@ const EXCLUDED_ROUTES = ['*', '/robots.txt', '/live/:idOrFilter?',
                          '/goto', '/faq', '/health', '/routes',
                          '/apple-app-site-association'];
 
-export default (router) => {
+export default (router, apiOptions) => {
   router.get('/routes', (ctx) => {
     ctx.body = router.stack
       .filter(function(r) {
@@ -79,4 +81,68 @@ export default (router) => {
       Allow: /
     `;
   });
+
+  router.post('/error', (ctx) => {
+    const { error } = ctx.request.body;
+    // log it out if it's a legit origin
+    if (ctx.headers.origin &&
+        apiOptions.servedOrigin.indexOf(ctx.headers.origin) === 0 &&
+        isString(error)) {
+      console.log(error.substring(0,1000));
+    }
+
+    ctx.body = null;
+    return;
+  });
+
+  router.post('/csp-report', (ctx) => {
+    // log it out if it's a legit origin
+    if (ctx.headers.origin &&
+        apiOptions.servedOrigin.indexOf(ctx.headers.origin) === 0) {
+
+      const { 'csp-report': report } = ctx.request.body;
+
+      const log = [
+        'CSP REPORT',
+        report['document-uri'],
+        report['blocked-uri'],
+      ];
+
+      console.log(log.join('|'));
+    }
+
+    ctx.body = null;
+    return;
+  });
+
+  router.post('/timings', function *() {
+    const statsURL = app.config.statsURL;
+    const timings = this.request.body.rum;
+
+    if (!app.config.actionNameSecret) {
+      console.log('returning early, no secret');
+      return;
+    }
+
+    const secret = (new Buffer(app.config.actionNameSecret, 'base64')).toString();
+    const algorithm = 'sha1';
+    let hash;
+
+    const hmac = crypto.createHmac(algorithm, secret);
+    hmac.setEncoding('hex');
+    hmac.write(timings.actionName);
+    hmac.end();
+
+    hash = hmac.read();
+
+    timings.verification = hash;
+
+    superagent
+        .post(statsURL)
+        .type('json')
+        .send({ rum: timings })
+        .timeout(constants.DEFAULT_API_TIMEOUT)
+        .end(function() { });
+  });
+
 };
