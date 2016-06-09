@@ -1,22 +1,35 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { some } from 'lodash/collection';
+
+import { flags } from 'app/constants';
+import { featuresSelector } from 'app/selectors/features';
 
 import CommentsList from 'app/components/CommentsList';
 import CommentsPageTools from 'app/components/CommentsPage/CommentsPageTools';
 import Post from 'app/components/Post';
 import Loading from 'app/components/Loading';
 import SubNav from 'app/components/SubNav';
+import RelevantContent from 'app/components/RelevantContent';
 
 import CommentsPageHandler from 'app/router/handlers/CommentsPage';
 import { paramsToCommentsPageId } from 'app/models/CommentsPage';
+import { paramsToPostsListsId } from 'app/models/PostsList';
+import { unabbreviateComments } from 'app/actions/commentsPage';
+
+const {
+  VARIANT_NEXTCONTENT_BOTTOM,
+} = flags;
 
 const commentsPageSelector = createSelector(
   (state, props) => props,
   (state) => state.commentsPages,
   (state) => state.posts,
   (state) => state.platform.currentPage,
-  (pageProps, commentsPages, posts, currentPage) => {
+  featuresSelector,
+  (state) => state.postsLists,
+  (pageProps, commentsPages, posts, currentPage, feature, postsLists) => {
     const commentsPageParams = CommentsPageHandler.PageParamsToCommentsPageParams(pageProps);
     const commentsPageId = paramsToCommentsPageId(commentsPageParams);
     const commentsPage = commentsPages[commentsPageId];
@@ -29,6 +42,15 @@ const commentsPageSelector = createSelector(
 
     const replying = currentPage.queryParams.commentReply === commentsPageParams.id;
 
+    const { subredditName } = commentsPageParams;
+    const postsParams = {
+      subredditName,
+    };
+    const postsListId = paramsToPostsListsId(postsParams);
+    const postsList = postsLists[postsListId];
+
+    const topPosts = (!postsList || postsList.loading) ? [] : postsList.results;
+
     return {
       postLoaded,
       commentsPageParams,
@@ -38,6 +60,8 @@ const commentsPageSelector = createSelector(
       topLevelComments,
       currentPage,
       replying,
+      feature,
+      topPosts,
     };
   },
 );
@@ -51,6 +75,8 @@ export const CommentsPage = connect(commentsPageSelector)((props) => {
     postLoaded,
     currentPage,
     replying,
+    feature,
+    topPosts,
   } = props;
 
   return (
@@ -75,6 +101,18 @@ export const CommentsPage = connect(commentsPageSelector)((props) => {
           permalinkBase={ permalinkBase }
           className={ 'CommentsList__topLevel' }
         /> }
+
+      { some([
+        'foo', // XXX
+        VARIANT_NEXTCONTENT_BOTTOM,
+      ], x => feature.enabled(x)) &&
+        <RelevantContent
+          listingId={ commentsPageParams.id }
+          subreddit={ {} }
+          subredditName='someSubredditWooHoo'
+          posts={ topPosts }
+        />
+      }
     </div>
   );
 });

@@ -19,7 +19,7 @@ const ensurePostTypePrefix = postId => {
 export default class CommentsPage extends BaseHandler {
   static PageParamsToCommentsPageParams({ urlParams, queryParams}) {
     let { postId } = urlParams;
-    const { commentId } = urlParams;
+    const { commentId, subredditName } = urlParams;
     const { sort, context } = queryParams;
 
     postId = ensurePostTypePrefix(postId);
@@ -36,6 +36,7 @@ export default class CommentsPage extends BaseHandler {
       id: postId,
       sort,
       query,
+      subredditName,
     });
   }
 
@@ -48,6 +49,7 @@ export default class CommentsPage extends BaseHandler {
 
     dispatch(commentsPageActions.fetchCommentsPage(commentsPageParams));
     fetchUserBasedData(dispatch);
+    dispatch(commentsPageActions.fetchRelevantContent(commentsPageParams)); // XXX use dedicated params?
   }
 
   async [METHODS.POST](dispatch, getState, { waitForState }) {

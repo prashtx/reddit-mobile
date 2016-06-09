@@ -58,6 +58,8 @@ export const DEFAULT_KEY_COLOR = '#336699';
 
 export const SET_META_COLOR = 'setMetaColor';
 
+export const VISITED_POSTS_KEY = 'visitedPosts';
+
 // Post content
 
 export const POST_COMPACT_THUMBNAIL_WIDTH = 70;
@@ -80,6 +82,13 @@ export const BANNER_URLS_DIRECT = {
 export const flags = {
   BETA: 'beta',
   SMARTBANNER: 'banner',
+  VARIANT_RELEVANCY_TOP: 'experimentRelevancyTop',
+  VARIANT_RELEVANCY_ENGAGING: 'experimentRelevancyEngaging',
+  VARIANT_RELEVANCY_RELATED: 'experimentRelevancyRelated',
+  VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
+  VARIANT_NEXTCONTENT_MIDDLE: 'experimentNextContentMiddle',
+  VARIANT_NEXTCONTENT_BANNER: 'experimentNextContentBanner',
+  VARIANT_NEXTCONTENT_TOP3: 'experimentNextContentTop3',
 };
 
 export const themes = {
