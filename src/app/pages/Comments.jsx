@@ -30,7 +30,7 @@ const commentsPageSelector = createSelector(
   featuresSelector,
   (state) => state.postsLists,
   (pageProps, commentsPages, posts, currentPage, feature, postsLists) => {
-    const commentsPageParams = CommentsPageHandler.PageParamsToCommentsPageParams(pageProps);
+    const commentsPageParams = CommentsPageHandler.pageParamsToCommentsPageParams(pageProps);
     const commentsPageId = paramsToCommentsPageId(commentsPageParams);
     const commentsPage = commentsPages[commentsPageId];
     const topLevelComments = (!commentsPage || commentsPage.loading)
