@@ -58,7 +58,7 @@ export default class CommentsPage extends BaseHandler {
     dispatch(commentsPageActions.fetchCommentsPage(commentsPageParams));
     fetchUserBasedData(dispatch);
 
-    const subredditPostsParams = PostsFromSubreddit.PageParamsToSubredditPostsParams(this);
+    const subredditPostsParams = PostsFromSubreddit.pageParamsToSubredditPostsParams(this);
     const { subredditName } = subredditPostsParams;
     if (!isFakeSubreddit(subredditName)) {
       dispatch(subredditActions.fetchSubreddit(subredditName));
