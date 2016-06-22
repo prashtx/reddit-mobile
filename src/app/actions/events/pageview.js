@@ -1,4 +1,8 @@
 import { parseRoute } from '@r/platform/navigationMiddleware';
+import EventTracker from 'event-tracker';
+import crypto from 'crypto';
+
+import makeRequest from 'lib/makeRequest';
 
 import { NIGHTMODE } from 'app/actions/theme';
 import routes from 'app/router';
@@ -207,6 +211,15 @@ export const waitForUser = (state) => {
   return state.user.name && state.accounts[state.user.name];
 };
 
+// XXX
+function calculateHash (key, string) {
+  const hmac = crypto.createHmac('sha256', key);
+  hmac.setEncoding('hex');
+  hmac.write(string);
+  hmac.end();
+
+  return hmac.read();
+}
 export const EVENT__PAGEVIEW = 'EVENT__PAGEVIEW';
 export const pageview = () => async (dispatch, getState, { waitForState }) => {
   const currentState = getState();
@@ -215,7 +228,22 @@ export const pageview = () => async (dispatch, getState, { waitForState }) => {
   const { handler } = parseRoute(currentPage.url, routes);
   const handlerName = handler.name;
 
-  return await waitForState((state) => (dataRequiredForHandler(state, handlerName)), () => {
-    console.log('PAGEVIEW', buildPageviewData(getState(), handlerName));
+  return await waitForState((state) => (dataRequiredForHandler(state, handlerName)), (state) => {
+    console.log('PAGEVIEW', buildPageviewData(state, handlerName));
+    const { config } = state;
+    const tracker = new EventTracker(
+      config.trackerKey,
+      config.trackerClientSecret,
+      ({ url, data, done }) => makeRequest.post(url).send(data).then(done),
+      config.trackerEndpoint,
+      config.trackerClientAppName,
+      calculateHash,
+      {
+        appendClientContext: true,
+        bufferLength: 1,
+      }
+    );
+    tracker.track('screenview_events', 'cs.screenview', buildPageviewData(state, handlerName));
+    // tracker.send();
   });
 };
