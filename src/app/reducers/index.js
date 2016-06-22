@@ -5,7 +5,11 @@ import collapsedComments from './collapsedComments';
 import comments from './comments';
 import commentsPages from './commentsPages';
 import compact from './compact';
+<<<<<<< 54a4440b14f49b5ab045bbf0c18ef02e03d418f6
 import expandedPosts from './expandedPosts';
+=======
+import config from './config';
+>>>>>>> (wip) Add tracking config to state
 import hiddenRequests from './hiddenRequests';
 import loid from './loid';
 <<<<<<< 28cfddc772be8b238025139a087599a914296547
@@ -35,6 +39,7 @@ export default {
   comments,
   commentsPages,
   compact,
+  config,
   expandedPosts,
   hiddenRequests,
   loid,
