@@ -1,3 +1,5 @@
+import { getEventTracker } from 'lib/eventTracker';
+
 import { getBasePayload } from './utils';
 
 function buildLoginData(state) {
@@ -22,6 +24,8 @@ export const login = () => async (dispatch, getState, { waitForState }) => {
 
   return await waitForState(state => state.user.name && state.accounts[state.user.name], () => {
     state = getState();
-    console.log('LOGIN', buildLoginData(state));
+    const data = buildLoginData(state);
+    console.log('LOGIN', data);
+    getEventTracker(state).track('login_events', 'cs.login_attempt', data);
   });
 };

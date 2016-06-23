@@ -1,6 +1,8 @@
 import { buildPageviewData } from './pageview';
 import { waitForValidSession } from './utils';
 
+import { getEventTracker } from 'lib/eventTracker';
+
 import { NAME as Search} from 'app/router/handlers/SearchPage';
 import { dataRequiredForHandler } from 'app/actions/events/pageview';
 
@@ -35,9 +37,11 @@ export const EVENT__SEARCH_EXECUTED = 'EVENT__SEARCH_EXECUTED';
 export const executed = (params, response) =>
   async (dispatch, getState, { waitForState }) => {
     return await waitForState((state) => (dataRequiredForHandler(state, Search)), () => {
-      const data = buildSearchData(getState(), params, response);
+      const state = getState();
+      const data = buildSearchData(state, params, response);
       data.type = SEARCH_EXECUTED;
       console.log('SEARCH_EXECUTED', data);
+      getEventTracker(state).track('search_events', 'search_executed', data);
     });
   };
 
@@ -49,6 +53,7 @@ export const cancelled = () =>
       const data = buildSearchData(newState);
       data.type = SEARCH_CANCELLED;
       console.log(data);
+      getEventTracker(newState).track('search_events', 'search_cancelled', data);
     });
   };
 
@@ -60,6 +65,7 @@ export const opened = () =>
       const data = buildSearchData(newState);
       data.type = SEARCH_OPENED;
       console.log(data);
+      getEventTracker(newState).track('search_events', 'search_opened', data);
     });
   };
 
@@ -71,5 +77,6 @@ export const formCleared = () =>
       const data = buildSearchData(newState);
       data.type = SEARCH_FORM_CLEARED;
       console.log(data);
+      getEventTracker(newState).track('search_events', 'search_form_cleared', data);
     });
   };
