@@ -1,8 +1,6 @@
 import { parseRoute } from '@r/platform/navigationMiddleware';
-import EventTracker from 'event-tracker';
-import crypto from 'crypto';
 
-import makeRequest from 'lib/makeRequest';
+import { getEventTracker } from 'lib/eventTracker';
 
 import { NIGHTMODE } from 'app/actions/theme';
 import routes from 'app/router';
@@ -55,15 +53,18 @@ export const buildSortOrderData = (state, handlerName) => {
     }
 
     if (handlerName === Search) {
-      const request = searchRequestSelector(state);
-
       if (queryParams.q) {
         data.query_string = queryParams.q;
         data.query_string_length = queryParams.q.length;
       }
 
-      data.sr_listing = request.subreddits.map(sr => state.subreddits[sr.uuid].displayName);
-      data.target_type = 'search_results';
+      // There are search-related events for which we won't have a request.
+      // XXX
+      const request = searchRequestSelector(state);
+      if (request) {
+        data.sr_listing = request.subreddits.map(sr => state.subreddits[sr.uuid].displayName);
+        data.target_type = 'search_results';
+      }
     }
   }
 
@@ -211,15 +212,6 @@ export const waitForUser = (state) => {
   return state.user.name && state.accounts[state.user.name];
 };
 
-// XXX
-function calculateHash (key, string) {
-  const hmac = crypto.createHmac('sha256', key);
-  hmac.setEncoding('hex');
-  hmac.write(string);
-  hmac.end();
-
-  return hmac.read();
-}
 export const EVENT__PAGEVIEW = 'EVENT__PAGEVIEW';
 export const pageview = () => async (dispatch, getState, { waitForState }) => {
   const currentState = getState();
@@ -229,21 +221,7 @@ export const pageview = () => async (dispatch, getState, { waitForState }) => {
   const handlerName = handler.name;
 
   return await waitForState((state) => (dataRequiredForHandler(state, handlerName)), (state) => {
-    console.log('PAGEVIEW', buildPageviewData(state, handlerName));
-    const { config } = state;
-    const tracker = new EventTracker(
-      config.trackerKey,
-      config.trackerClientSecret,
-      ({ url, data, done }) => makeRequest.post(url).send(data).then(done),
-      config.trackerEndpoint,
-      config.trackerClientAppName,
-      calculateHash,
-      {
-        appendClientContext: true,
-        bufferLength: 1,
-      }
-    );
-    tracker.track('screenview_events', 'cs.screenview', buildPageviewData(state, handlerName));
-    // tracker.send();
+    const data = buildPageviewData(state, handlerName);
+    getEventTracker(state).track('screenview_events', 'cs.screenview', data);
   });
 };

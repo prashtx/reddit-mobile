@@ -1,3 +1,5 @@
+import { getEventTracker } from 'lib/eventTracker';
+
 import {
   getBasePayload,
   convertId,
@@ -21,7 +23,7 @@ export function buildCommentData(state, comment) {
     post_created_ts: post.createdUTC,
     comment_id: convertId(comment.name),
     comment_fullname: comment.name,
-    comment_body: comment.body,
+    comment_body: comment.bodyHTML, // XXX use comment.body once snoode includes that field.
     parent_id: convertId(parent.name),
     parent_fullname: parent.name,
     parent_created_ts: parent.createdUTC,
@@ -31,11 +33,11 @@ export function buildCommentData(state, comment) {
 }
 
 export const EVENT__COMMENT_REPLY = 'EVENT__COMMENT_REPLY';
-export const reply = ({ comment }) => async (dispatch, getState, { waitForState }) => {
-  let state = getState();
-
+export const reply = ({ model }) => async (dispatch, getState, { waitForState }) => {
   return await waitForState(state => state.user.name && state.accounts[state.user.name], () => {
-    state = getState();
-    console.log('COMMENT REPLY', buildCommentData(state, comment));
+    const state = getState();
+    const data = buildCommentData(state, model);
+    console.log('COMMENT REPLY', data);
+    getEventTracker(state).track('comment_events', 'cs.comment', data);
   });
 };
