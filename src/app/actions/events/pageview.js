@@ -7,13 +7,17 @@ import routes from 'app/router';
 
 import { NAME as Comments } from 'app/router/handlers/CommentsPage';
 import { NAME as Posts } from 'app/router/handlers/PostsFromSubreddit';
+import PostsFromSubreddit from 'app/router/handlers/PostsFromSubreddit';
 import { NAME as Search} from 'app/router/handlers/SearchPage';
 import { searchRequestSelector } from 'app/pages/SearchPage';
+import { paramsToPostsListsId } from 'app/models/PostsList';
 
 import {
   getBasePayload,
   convertId,
   getCurrentSubredditFromState,
+  getCurrentUrlParamsFromState,
+  getCurrentQueryParamsFromState,
   //getCurrentPostFromState,
   //getCurrentUserFromState,
   //getThingFromStateById,
@@ -58,9 +62,8 @@ export const buildSortOrderData = (state, handlerName) => {
         data.query_string_length = queryParams.q.length;
       }
 
-      // There are search-related events for which we won't have a request.
-      // XXX
       const request = searchRequestSelector(state);
+      // There are search-related events for which we won't have a request.
       if (request) {
         data.sr_listing = request.subreddits.map(sr => state.subreddits[sr.uuid].displayName);
         data.target_type = 'search_results';
@@ -104,7 +107,33 @@ export const buildNightModeData = (state) => {
   return {};
 };
 
-export const buildTargetData = (/*state, handlerName*/) => {
+export const buildTargetData = (state, handlerName) => {
+  switch (handlerName) {
+    case Comments: {
+      // target_id
+      // target_fullname
+      return {
+        target_type: 'comment',
+      };
+    }
+    case Search: {
+      return {};
+    }
+    case Posts: {
+      const subreddit = getCurrentSubredditFromState(state);
+      const target_id = convertId(subreddit.id);
+      return {
+        target_id,
+        target_fullname: subreddit.name,
+        target_type: 'listing',
+        listing_name: subreddit.uuid,
+      };
+    }
+    default: {
+      return {};
+    }
+  }
+
   /*
   let target;
 
@@ -165,7 +194,6 @@ export const buildTargetData = (/*state, handlerName*/) => {
     }
   }
   */
-  return {};
 };
 
 export const dataRequiredForHandler = (state, handlerName) => {
@@ -182,10 +210,25 @@ export const dataRequiredForHandler = (state, handlerName) => {
       return request && !request.loading;
     }
     case Posts: {
-      console.log('returning true for posts');
-      return true;
-      // subredditRequests and postsLists
-      // return state.postsLists && state.subredditRequests;
+      const subreddit = getCurrentSubredditFromState(state);
+      // const subredditRequest = subreddit ? state.subredditRequests[subreddit.uuid] : null;
+
+      const urlParams = getCurrentUrlParamsFromState(state);
+      const queryParams = getCurrentQueryParamsFromState(state);
+      const postsParams = PostsFromSubreddit.pageParamsToSubredditPostsParams({
+        urlParams,
+        queryParams,
+      });
+      const postsListId = paramsToPostsListsId(postsParams);
+      const postsList = state.postsLists[postsListId];
+
+      // XXX We only need to wait for the list of posts if we plan to include
+      // the link_listing payload field.
+      return !!(
+        subreddit &&
+        postsList &&
+        !postsList.loading
+      );
     }
     default: {
       return true;

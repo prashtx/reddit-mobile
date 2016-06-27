@@ -20,7 +20,6 @@ const actionEventMap = {
   [search.OPEN_SEARCH]: searchEvent.opened,
   [search.SEARCHED]: searchEvent.executed,
   [search.CLOSE_SEARCH]: searchEvent.cancelled,
-  [search.CLEAR_SEARCH]: searchEvent.formCleared,
   // submit post
 };
 

@@ -9,7 +9,6 @@ import { dataRequiredForHandler } from 'app/actions/events/pageview';
 const SEARCH_EXECUTED = 'search_executed';
 const SEARCH_CANCELLED = 'search_cancelled';
 const SEARCH_OPENED = 'search_opened';
-const SEARCH_FORM_CLEARED = 'search_form_cleared';
 
 export function formatParams(params) {
   console.log(params);
@@ -66,17 +65,5 @@ export const opened = () =>
       data.type = SEARCH_OPENED;
       console.log(data);
       getEventTracker(newState).track('search_events', 'search_opened', data);
-    });
-  };
-
-export const EVENT__SEARCH_FORM_CLEARED = 'EVENT__SEARCH_FORM_CLEARED';
-export const formCleared = () =>
-  async (dispatch, getState, { waitForState }) => {
-    const state = getState();
-    await waitForValidSession(state, waitForState, newState => {
-      const data = buildSearchData(newState);
-      data.type = SEARCH_FORM_CLEARED;
-      console.log(data);
-      getEventTracker(newState).track('search_events', 'search_form_cleared', data);
     });
   };

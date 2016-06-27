@@ -39,11 +39,15 @@ export function getCurrentUrlParamsFromState (state) {
   return state.platform.currentPage.urlParams;
 }
 
+export function getCurrentQueryParamsFromState (state) {
+  return state.platform.currentPage.queryParams;
+}
+
 export function getCurrentSubredditFromState (state) {
   const { subredditName } = getCurrentUrlParamsFromState(state);
   if (!subredditName) { return; }
 
-  return state.subreddits[subredditName];
+  return state.subreddits[subredditName.toLowerCase()];
 }
 
 export function getCurrentPostFromState (state) {
