@@ -25,7 +25,7 @@ function DefaultLayout (props) {
 
   let canonical;
 
-  if (config.url) {
+  if (config.reddit && props.ctx.url) {
     canonical = (
       <link rel='canonical' href={ `${config.reddit}${props.ctx.url}` } />
     );
