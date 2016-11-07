@@ -26,6 +26,7 @@ import PostSubmitCommunityModal from 'app/components/PostSubmitCommunityModal';
 import PostSubmitModal from 'app/components/PostSubmitModal';
 import Register from 'app/components/Register';
 import SmartBanner from 'app/components/SmartBanner';
+import InterstitialPromo from 'app/components/InterstitialPromo';
 import Toaster from 'app/components/Toaster';
 import TopNav from 'app/components/TopNav';
 
@@ -39,6 +40,7 @@ const AppMain = props => {
     isModalOpen,
     showDropdownCover,
     showSmartBanner,
+    showInterstitial,
   } = props;
 
   if (statusCode !== 200) {
@@ -75,6 +77,7 @@ const AppMain = props => {
           // routes in r/platform. Both of these will be investigated
           return (
             <div>
+              { showInterstitial ? /* XXX */ <InterstitialPromo /> : null }
               <TopNav />
               <div className='BelowTopNav'>
                 <EUCookieNotice />
@@ -142,17 +145,20 @@ const selector = createSelector(
   state => !!state.posting.captchaIden,
   state => !!state.modal.type,
   state => state.smartBanner.showBanner,
+  state => state.smartBanner.showBanner,
   (
     currentPage,
     isToasterOpen,
     isTooltipOpen,
     isCaptchaOpen,
     isModalOpen,
-    showSmartBanner
+    showSmartBanner,
+    showInterstitial
   ) => ({
     isModalOpen,
     isToasterOpen,
     showSmartBanner,
+    showInterstitial,
     showDropdownCover: isTooltipOpen || isCaptchaOpen || isModalOpen,
     url: currentPage.url,
     referrer: currentPage.referrer,
