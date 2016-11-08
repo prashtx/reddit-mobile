@@ -144,8 +144,8 @@ const selector = createSelector(
   state => !!state.widgets.tooltip.id,
   state => !!state.posting.captchaIden,
   state => !!state.modal.type,
-  state => state.smartBanner.showBanner,
-  state => state.smartBanner.showBanner,
+  state => state.smartBanner.showBanner && false, // XXX
+  state => state.smartBanner.showBanner, // XXX
   (
     currentPage,
     isToasterOpen,
@@ -158,7 +158,7 @@ const selector = createSelector(
     isModalOpen,
     isToasterOpen,
     showSmartBanner,
-    showInterstitial,
+    showInterstitial, // XXX use the feature flag to choose between smartbanner and interstitial
     showDropdownCover: isTooltipOpen || isCaptchaOpen || isModalOpen,
     url: currentPage.url,
     referrer: currentPage.referrer,
