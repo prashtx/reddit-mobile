@@ -9,6 +9,7 @@ import { createSelector } from 'reselect';
 
 import * as smartBannerActions from 'app/actions/smartBanner';
 import SnooIcon from '../SnooIcon';
+import Logo from '../Logo';
 
 const T = React.PropTypes;
 
@@ -17,42 +18,30 @@ const TITLE = 'Just a tap away';
 const SUBTITLE = 'Why are you still using the browser? The Reddit app is the easiest way to browser Reddit when you\'re on the go.';
 const CTA = 'Tap to get Reddit';
 
-// Display helpers
-const NOOP = () => {};
+function InterstitialPromo(props) {
+  const { url, onClose } = props;
+  // XXX const { isShowing } = this.state;
 
-class InterstitialPromo extends React.Component {
-  state = { isShowing: true }; // XXX
-
-  // XXX
-  onClick = () => {
-    this.setState({ isShowing: false });
-  };
-
-  render() {
-    const { url, onClose } = this.props;
-    // XXX const { isShowing } = this.state;
-
-    // XXX add logotype under SnooIcon
-    return (
-      <div className='InterstitialPromo'>
-        <div
-          className='InterstitialPromo__close icon icon-x'
-          onClick={ onClose }
-        />
-        <div className='InterstitialPromo__icon'>
-          <SnooIcon />
-        </div>
-        <div className='InterstitialPromo__header'>
-          <div className='InterstitialPromo__title'>{ TITLE }</div>
-          <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
-        </div>
-        <a className='InterstitialPromo__button' href={ url }>{ CTA /* XXX right-pointing triangle */ }</a>
-        <div className='InterstitialPromo__dismissal'>
-          <div className='InterstitialPromo__dismissaltext'>or go to the <a className='InterstitialPromo__altlink' onclick={ onClose }>mobile site</a></div>
-        </div>
+  return (
+    <div className='InterstitialPromo'>
+      <div
+        className='InterstitialPromo__close icon icon-x'
+        onClick={ onClose }
+      />
+      <div className='InterstitialPromo__icon'>
+        <SnooIcon />
       </div>
-    );
-  }
+      <div className='InterstitialPromo__wordmark'>
+        <Logo />
+      </div>
+      <div className='InterstitialPromo__header'>
+        <div className='InterstitialPromo__title'>{ TITLE }</div>
+        <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
+      </div>
+      <a className='InterstitialPromo__button' href={ url }>{ CTA /* XXX right-pointing triangle */ }</a>
+      <div className='InterstitialPromo__dismissal'>or go to the <a onClick={ onClose }>mobile site</a></div>
+    </div>
+  );
 }
 
 InterstitialPromo.propTypes = {
