@@ -3,7 +3,7 @@
 import './styles.less';
 
 import React from 'react';
-import { Motion, spring } from 'react-motion';
+// XXX import { Motion, spring } from 'react-motion';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
@@ -13,41 +13,42 @@ import SnooIcon from '../SnooIcon';
 const T = React.PropTypes;
 
 // String constants
-const TITLE = 'Reddit';
-const SUBTITLE = 'Get the official mobile app';
-const CTA = 'GET THE APP';
+const TITLE = 'Just a tap away';
+const SUBTITLE = 'Why are you still using the browser? The Reddit app is the easiest way to browser Reddit when you\'re on the go.';
+const CTA = 'Tap to get Reddit';
 
 // Display helpers
 const NOOP = () => {};
 
 class InterstitialPromo extends React.Component {
-  state = { isShowing: true };
+  state = { isShowing: true }; // XXX
 
+  // XXX
   onClick = () => {
     this.setState({ isShowing: false });
   };
 
   render() {
     const { url, onClose } = this.props;
-    const { isShowing } = this.state;
+    // XXX const { isShowing } = this.state;
 
+    // XXX add logotype under SnooIcon
     return (
       <div className='InterstitialPromo'>
-        <div className='InterstitialPromo__left'>
-          <div
-            className='InterstitialPromo__close icon icon-x'
-            onClick={ onClose }
-          />
-          <div className='InterstitialPromo__icon'>
-            <SnooIcon />
-          </div>
-          <div className='InterstitialPromo__header'>
-            <div className='InterstitialPromo__title'>{ TITLE }</div>
-            <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
-          </div>
+        <div
+          className='InterstitialPromo__close icon icon-x'
+          onClick={ onClose }
+        />
+        <div className='InterstitialPromo__icon'>
+          <SnooIcon />
         </div>
-        <div className='InterstitialPromo__right'>
-          <a className='InterstitialPromo__button' href={ url }>{ CTA }</a>
+        <div className='InterstitialPromo__header'>
+          <div className='InterstitialPromo__title'>{ TITLE }</div>
+          <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
+        </div>
+        <a className='InterstitialPromo__button' href={ url }>{ CTA /* XXX right-pointing triangle */ }</a>
+        <div className='InterstitialPromo__dismissal'>
+          <div className='InterstitialPromo__dismissaltext'>or go to the <a className='InterstitialPromo__altlink' onclick={ onClose }>mobile site</a></div>
         </div>
       </div>
     );
