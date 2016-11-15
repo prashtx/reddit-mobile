@@ -9,7 +9,21 @@
   text-align: center;
 
   .themeify({
-    background-color: @theme-nav-bar-color;
+    color: @black;
+    fill: @black;
+  });
+
+  // XXX night mode?
+  // .themeify({
+  //   background-color: @theme-nav-bar-color;
+  // });
+
+  .themeify({
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), @white), url(/img/white-pattern.jpg);
+    background-repeat: no-repeat, no-repeat;
+    background-size: cover, auto 75%;
+    background: -webkit-linear-gradient(top, rgba(255,255,255,0), @white), -moz-linear-gradient(top, rgba(255,255,255,0), @white), -o-linear-gradient(top, rgba(255,255,255,0), @white), linear-gradient(to bottom, rgba(255,255,255,0), @white);
+    background-color: @white;
   });
 
   &__close {
@@ -19,7 +33,10 @@
     display: inline-block;
     vertical-align: middle;
     padding: @grid-size @half-grid-size;
-    color: @grey-text;
+    .themeify({
+      // XXX night mode?
+      color: @grey-text;
+    });
     font-size: @font-size-h2;
   }
 
@@ -72,9 +89,9 @@
     font-weight: bold;
     line-height: 1.2;
 
-    .themeify({
-      color: @theme-body-text-color;
-    });
+    // .themeify({
+    //   color: @theme-body-text-color;
+    // });
   }
 
   &__subtitle {
@@ -119,10 +136,10 @@
 }
 
 .InterstitialPromo + .TopNav {
-  position: static;
+  position: relative;
 }
 
 .InterstitialPromo + .TopNav + .BelowTopNav {
   margin-top: 0;
-  position: static;
+  position: relative;
 }
