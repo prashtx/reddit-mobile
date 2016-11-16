@@ -3,6 +3,7 @@ import omitBy from 'lodash/omitBy';
 import isNull from 'lodash/isNull';
 
 import getSubreddit from 'lib/getSubredditFromState';
+import getRouteMetaFromState from 'lib/getRouteMetaFromState';
 import url from 'url';
 import { getEventTracker } from 'lib/eventTracker';
 
@@ -24,7 +25,14 @@ const {
 
 const config = {
   [BETA]: true,
-  [SMARTBANNER]: true, // XXX
+  [SMARTBANNER]: {
+    allowedPages: [
+      'index',
+      'listing',
+      // XXX We were restricting the banner on comments pages to 5% of users. Should we disable it for now?
+      // 'comments',
+    ],
+  },
   [USE_BRANCH]: true,
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
@@ -81,6 +89,8 @@ const config = {
     }, {
       directVisit: true,
     }, {
+      allowedPages: ['index'],
+    }, {
       variant: 'mweb_xpromo_interstitial:base',
     }],
   },
@@ -91,6 +101,8 @@ const config = {
     }, {
       directVisit: true,
     }, {
+      allowedPages: ['index'],
+    }, {
       variant: 'mweb_xpromo_interstitial:list',
     }],
   },
@@ -100,6 +112,8 @@ const config = {
       loggedin: false,
     }, {
       directVisit: true,
+    }, {
+      allowedPages: ['index'],
     }, {
       variant: 'mweb_xpromo_interstitial:rating',
     }],
@@ -218,6 +232,12 @@ flags.addRule('directVisit', function (wantDirect) {
   const isDirect = !referrer && this.state.platform.history.length <= 2;
 
   return isDirect === wantDirect;
+});
+
+flags.addRule('allowedPages', function (allowedPages) {
+  const routeMeta = getRouteMetaFromState(this.state);
+  const actionName = routeMeta && routeMeta.name;
+  return allowedPages.includes(actionName);
 });
 
 export default flags;

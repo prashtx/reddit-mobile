@@ -39,7 +39,7 @@ const checkDeviceType = (allowedAgents, userAgentString) => {
   return allowedAgents.some(a => userAgentString.indexOf(a) > -1);
 };
 
-export function shouldShowBanner({ actionName, loidCreated, userAgent, feature }={}) {
+export function shouldShowBanner({ loidCreated, userAgent, feature }={}) {
   // Lots of options we have to consider.
   // 1) Easiest. Make sure local storage exists
   if (!localStorageAvailable()) { return BASE_VAL; }
@@ -53,17 +53,12 @@ export function shouldShowBanner({ actionName, loidCreated, userAgent, feature }
   }
 
   // 3) Check if the loid is at least 1 day old
-  // XXX Move this to the feature flag component?
+  // XXX Move this to the feature flag component, so it only applies to the insterstitial experiment, not the smart banner.
   if (!loidCreated) { return BASE_VAL; }
   const age = (new Date()) - (new Date(loidCreated));
   if (age < MIN_LOID_AGE) { return BASE_VAL; }
 
-  // XXX check the appropriate variants (unless we always fall back on the vanilla banner)
-
-  // 4) Check if we're on the right page.
-  if (!ALLOWED_PAGES.has(actionName)) { return BASE_VAL; }
-
-  // 5) Check the user agent
+  // 4) Check the user agent
   if (!checkDeviceType(ALLOWED_DEVICES, userAgent)) { return BASE_VAL; }
 
   // XXX Lean on the featureFlags component for the bucketing, so we can in turn rely on r2.

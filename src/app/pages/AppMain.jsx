@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { some } from 'lodash/collection';
 
 import { UrlSwitch, Page, Case } from '@r/platform/url';
 
@@ -13,6 +14,7 @@ import { UserActivityPage } from './UserActivity';
 import { UserProfilePage } from './UserProfile';
 import { WikiPage } from './WikiPage';
 
+import { flags as flagConstants } from 'app/constants';
 
 import DirectMessage from 'app/components/DirectMessage';
 import DropdownCover from 'app/components/DropdownCover';
@@ -29,6 +31,14 @@ import SmartBanner from 'app/components/SmartBanner';
 import InterstitialPromo from 'app/components/InterstitialPromo';
 import Toaster from 'app/components/Toaster';
 import TopNav from 'app/components/TopNav';
+
+import { featuresSelector } from 'app/selectors/features';
+
+const {
+  VARIANT_XPROMO_BASE,
+  VARIANT_XPROMO_LIST,
+  VARIANT_XPROMO_RATING,
+} = flagConstants;
 
 const AppMain = props => {
 
@@ -77,7 +87,7 @@ const AppMain = props => {
           // routes in r/platform. Both of these will be investigated
           return (
             <div>
-              { showInterstitial ? /* XXX */ <InterstitialPromo /> : null }
+              { showInterstitial ? <InterstitialPromo /> : null }
               <TopNav />
               <div className='BelowTopNav'>
                 <EUCookieNotice />
@@ -139,31 +149,40 @@ const AppMain = props => {
 };
 
 const selector = createSelector(
+  featuresSelector,
   state => state.platform.currentPage,
   state => state.toaster.isOpen,
   state => !!state.widgets.tooltip.id,
   state => !!state.posting.captchaIden,
   state => !!state.modal.type,
-  state => state.smartBanner.showBanner && false, // XXX
-  state => state.smartBanner.showBanner, // XXX
+  state => state.smartBanner.showBanner,
   (
+    features,
     currentPage,
     isToasterOpen,
     isTooltipOpen,
     isCaptchaOpen,
     isModalOpen,
-    showSmartBanner,
-    showInterstitial
-  ) => ({
-    isModalOpen,
-    isToasterOpen,
-    showSmartBanner,
-    showInterstitial, // XXX use the feature flag to choose between smartbanner and interstitial
-    showDropdownCover: isTooltipOpen || isCaptchaOpen || isModalOpen,
-    url: currentPage.url,
-    referrer: currentPage.referrer,
-    statusCode: currentPage.status,
-  })
+    showSmartBanner
+  ) => {
+    const showInterstitial = showSmartBanner &&
+      some([
+        VARIANT_XPROMO_BASE,
+        VARIANT_XPROMO_LIST,
+        VARIANT_XPROMO_RATING,
+      ], variant => features.enabled(variant));
+
+    return {
+      isModalOpen,
+      isToasterOpen,
+      showSmartBanner: showSmartBanner && !showInterstitial,
+      showInterstitial,
+      showDropdownCover: isTooltipOpen || isCaptchaOpen || isModalOpen,
+      url: currentPage.url,
+      referrer: currentPage.referrer,
+      statusCode: currentPage.status,
+    };
+  }
 );
 
 export default connect(selector)(AppMain);

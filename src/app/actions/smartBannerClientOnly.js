@@ -2,7 +2,6 @@ import branch from 'branch-sdk';
 
 import config from 'config';
 
-import getRouteMetaFromState from 'lib/getRouteMetaFromState';
 import { shouldShowBanner } from 'lib/smartBannerState';
 import { show } from 'app/actions/smartBanner';
 import features from 'app/featureFlags';
@@ -24,12 +23,10 @@ async function generateLink(payload) {
 // action code, so we can confine branch-sdk to the client.
 export const checkAndSet = () => async (dispatch, getState) => {
   const state = getState();
-  const routeMeta = getRouteMetaFromState(state);
   const {
     showBanner,
     clickUrl,
   } = shouldShowBanner({
-    actionName: routeMeta && routeMeta.name,
     loidCreated: state.accounts.me && state.accounts.me.loidCreated,
     userAgent: state.meta.userAgent || '',
     feature: features.withState(state),
