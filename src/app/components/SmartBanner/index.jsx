@@ -77,7 +77,7 @@ SmartBanner.propTypes = {
 };
 
 const selector = createSelector(
-  state => state.smartBanner.clickUrl,
+  state => state.smartBanner.deepLinks[0],
   url => ({ url })
 );
 

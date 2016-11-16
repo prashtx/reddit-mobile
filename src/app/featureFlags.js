@@ -11,16 +11,21 @@ import { flags as flagConstants } from './constants';
 const {
   BETA,
   SMARTBANNER,
+  USE_BRANCH,
   VARIANT_NEXTCONTENT_BOTTOM,
   VARIANT_RECOMMENDED_BOTTOM,
   VARIANT_RECOMMENDED_TOP,
   VARIANT_RECOMMENDED_TOP_PLAIN,
   VARIANT_SUBREDDIT_HEADER,
+  VARIANT_XPROMO_BASE,
+  VARIANT_XPROMO_LIST,
+  VARIANT_XPROMO_RATING,
 } = flagConstants;
 
 const config = {
   [BETA]: true,
-  [SMARTBANNER]: true,
+  [SMARTBANNER]: true, // XXX
+  [USE_BRANCH]: true,
   [VARIANT_NEXTCONTENT_BOTTOM]: {
     url: 'experimentnextcontentbottom',
     and: [{
@@ -67,6 +72,36 @@ const config = {
       loggedin: false,
     }, {
       seoReferrer: true,
+    }],
+  },
+  [VARIANT_XPROMO_BASE]: {
+    url: 'xpromobase',
+    and: [{
+      loggedin: false,
+    }, {
+      directVisit: true,
+    }, {
+      variant: 'mweb_xpromo_interstitial:base',
+    }],
+  },
+  [VARIANT_XPROMO_LIST]: {
+    url: 'xpromolist',
+    and: [{
+      loggedin: false,
+    }, {
+      directVisit: true,
+    }, {
+      variant: 'mweb_xpromo_interstitial:list',
+    }],
+  },
+  [VARIANT_XPROMO_RATING]: {
+    url: 'xpromorating',
+    and: [{
+      loggedin: false,
+    }, {
+      directVisit: true,
+    }, {
+      variant: 'mweb_xpromo_interstitial:rating',
     }],
   },
 };
@@ -173,6 +208,16 @@ flags.addRule('seoReferrer', function (wantSEO) {
 
   // Compare if we want the user to be from SEO or not
   return (isSEO === wantSEO);
+});
+
+flags.addRule('directVisit', function (wantDirect) {
+  const referrer = this.state.platform.currentPage.referrer;
+
+  // TODO: We end up adding the initial page to the history twice, once due to
+  // the platform SET_STATUS action and once due to the SET_PAGE action.
+  const isDirect = !referrer && this.state.platform.history.length <= 2;
+
+  return isDirect === wantDirect;
 });
 
 export default flags;

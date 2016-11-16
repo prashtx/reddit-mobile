@@ -80,11 +80,15 @@ export const BANNER_URLS_DIRECT = {
 export const flags = {
   BETA: 'beta',
   SMARTBANNER: 'banner',
+  USE_BRANCH: 'useBranch',
   VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
   VARIANT_RECOMMENDED_BOTTOM: 'experimentRecommendedBottom',
   VARIANT_RECOMMENDED_TOP: 'experimentRecommendedTop',
   VARIANT_RECOMMENDED_TOP_PLAIN: 'experimentRecommendedTopPlain',
   VARIANT_SUBREDDIT_HEADER: 'experimentSubredditHeader',
+  VARIANT_XPROMO_BASE: 'experimentXPromoBase',
+  VARIANT_XPROMO_LIST: 'experimentXPromoList',
+  VARIANT_XPROMO_RATING: 'experimentXPromoRating',
 };
 
 export const themes = {

@@ -1,10 +1,10 @@
 import { markBannerClosed } from 'lib/smartBannerState';
 
 export const SHOW = 'SMARTBANNER__SHOW';
-export const show = clickUrl => ({
+export const show = deepLinks => ({
   type: SHOW,
   data: {
-    clickUrl,
+    deepLinks,
   },
 });
 

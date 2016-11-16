@@ -5,7 +5,7 @@ import * as smartBannerActions from 'app/actions/smartBanner';
 
 export const DEFAULT = {
   showBanner: false,
-  clickUrl: null,
+  deepLinks: [],
 };
 
 export default function(state=DEFAULT, action={}) {

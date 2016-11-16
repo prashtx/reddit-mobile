@@ -19,7 +19,7 @@ const SUBTITLE = 'Why are you still using the browser? The Reddit app is the eas
 const CTA = 'Tap to get Reddit';
 
 function InterstitialPromo(props) {
-  const { url, onClose } = props;
+  const { urls, onClose } = props;
   // XXX const { isShowing } = this.state;
 
   return (
@@ -38,20 +38,20 @@ function InterstitialPromo(props) {
         <div className='InterstitialPromo__title'>{ TITLE }</div>
         <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
       </div>
-      <a className='InterstitialPromo__button' href={ url }>{ CTA /* XXX right-pointing triangle */ }</a>
+      <a className='InterstitialPromo__button' href={ urls[0] }>{ CTA /* XXX right-pointing triangle */ }</a>
       <div className='InterstitialPromo__dismissal'>or go to the <a onClick={ onClose }>mobile site</a></div>
     </div>
   );
 }
 
 InterstitialPromo.propTypes = {
-  url: T.string.isRequired,
+  urls: T.array.isRequired,
   onClose: T.func,
 };
 
 const selector = createSelector(
-  state => state.smartBanner.clickUrl,
-  url => ({ url })
+  state => state.smartBanner.deepLinks,
+  urls => ({ urls })
 );
 
 const mapDispatchToProps = dispatch => ({
