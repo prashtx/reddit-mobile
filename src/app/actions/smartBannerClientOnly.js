@@ -4,7 +4,6 @@ import config from 'config';
 
 import { shouldShowBanner } from 'lib/smartBannerState';
 import { show } from 'app/actions/smartBanner';
-import features from 'app/featureFlags';
 
 async function generateLink(payload) {
   return new Promise((resolve, reject) => {
@@ -26,11 +25,7 @@ export const checkAndSet = () => async (dispatch, getState) => {
   const {
     showBanner,
     clickUrl,
-  } = shouldShowBanner({
-    loidCreated: state.accounts.me && state.accounts.me.loidCreated,
-    userAgent: state.meta.userAgent || '',
-    feature: features.withState(state),
-  });
+  } = shouldShowBanner(state);
 
   const { me={} } = state.accounts;
   const { loid, loidCreated } = me;

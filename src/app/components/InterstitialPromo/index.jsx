@@ -3,24 +3,72 @@
 import './styles.less';
 
 import React from 'react';
-// XXX import { Motion, spring } from 'react-motion';
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
+import { createStructuredSelector } from 'reselect';
 
+import { flags } from 'app/constants';
+import { getDevice } from 'lib/getDeviceFromState';
+
+import { featuresSelector} from 'app/selectors/features';
 import * as smartBannerActions from 'app/actions/smartBanner';
 import SnooIcon from '../SnooIcon';
 import Logo from '../Logo';
 
 const T = React.PropTypes;
 
+const {
+  VARIANT_XPROMO_LIST,
+  VARIANT_XPROMO_RATING,
+} = flags;
+
 // String constants
 const TITLE = 'Just a tap away';
-const SUBTITLE = 'Why are you still using the browser? The Reddit app is the easiest way to browser Reddit when you\'re on the go.';
+const SUBTITLE = `Why are you still using the browser?
+The Reddit app is the easiest way to browser Reddit when you're on the go.`;
 const CTA = 'Tap to get Reddit';
 
+
+function List() {
+  return (
+    <div className='InterstitialPromo__bulletlist'>
+      <ul>
+        <li><span>Lightning Fast</span></li>
+        <li><span>Autoplay GIFs</span></li>
+        <li><span>Infinite Scroll</span></li>
+      </ul>
+    </div>
+  );
+}
+
+function Rating(props) {
+  const { device } = props;
+
+  return (
+    <div className='InterstitialPromo__rating'>
+      <div className='InterstitialPromo__rating_icon'>
+        <SnooIcon />
+      </div>
+      <div className='InterstitialPromo__rating_right'>
+        <div className='InterstitialPromo__rating_title'>
+          Reddit for { device }
+        </div>
+        <div className='InterstitialPromo__rating_stars'>
+          <span className='icon icon-gold'></span>
+          <span className='icon icon-gold'></span>
+          <span className='icon icon-gold'></span>
+          <span className='icon icon-gold'></span>
+          <span className='icon icon-gold'></span>
+        </div>
+        <div className='InterstitialPromo__rating_text'>
+          5,000+ 5-star reviews
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function InterstitialPromo(props) {
-  const { urls, onClose } = props;
-  // XXX const { isShowing } = this.state;
+  const { urls, onClose, features, device } = props;
 
   return (
     <div className='InterstitialPromo'>
@@ -37,9 +85,19 @@ function InterstitialPromo(props) {
       <div className='InterstitialPromo__header'>
         <div className='InterstitialPromo__title'>{ TITLE }</div>
         <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
+        { features.enabled(VARIANT_XPROMO_LIST) ? <List /> : null }
       </div>
-      <a className='InterstitialPromo__button' href={ urls[0] }>{ CTA /* XXX right-pointing triangle */ }</a>
-      <div className='InterstitialPromo__dismissal'>or go to the <a onClick={ onClose }>mobile site</a></div>
+      <a
+        className='InterstitialPromo__button'
+        href={ urls[0] }
+      >
+        { CTA }
+        <span className="icon icon-play"></span>
+      </a>
+      <div className='InterstitialPromo__dismissal'>
+        or go to the <a onClick={ onClose }>mobile site</a>
+      </div>
+      { features.enabled(VARIANT_XPROMO_RATING) ? <Rating device={ device }/> : null }
     </div>
   );
 }
@@ -49,10 +107,11 @@ InterstitialPromo.propTypes = {
   onClose: T.func,
 };
 
-const selector = createSelector(
-  state => state.smartBanner.deepLinks,
-  urls => ({ urls })
-);
+const selector = createStructuredSelector({
+  urls: state => state.smartBanner.deepLinks,
+  features: featuresSelector,
+  device: getDevice,
+});
 
 const mapDispatchToProps = dispatch => ({
   onClose: () => dispatch(smartBannerActions.close()),

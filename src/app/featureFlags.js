@@ -87,6 +87,8 @@ const config = {
     and: [{
       loggedin: false,
     }, {
+      minLoidAge: 24 * 60 * 60 * 1000, // 1 day in ms
+    }, {
       directVisit: true,
     }, {
       allowedPages: ['index'],
@@ -99,6 +101,8 @@ const config = {
     and: [{
       loggedin: false,
     }, {
+      minLoidAge: 24 * 60 * 60 * 1000, // 1 day in ms
+    }, {
       directVisit: true,
     }, {
       allowedPages: ['index'],
@@ -110,6 +114,8 @@ const config = {
     url: 'xpromorating',
     and: [{
       loggedin: false,
+    }, {
+      minLoidAge: 24 * 60 * 60 * 1000, // 1 day in ms
     }, {
       directVisit: true,
     }, {
@@ -238,6 +244,22 @@ flags.addRule('allowedPages', function (allowedPages) {
   const routeMeta = getRouteMetaFromState(this.state);
   const actionName = routeMeta && routeMeta.name;
   return allowedPages.includes(actionName);
+});
+
+// This returns false when no loidCreated value is present, but it should
+// really be used in conjunction with a loggedin: false rule, in which case we
+// expect to have an loidCreated value.
+flags.addRule('minLoidAge', function (minAge) {
+  const loidCreated = this.state.accounts.me && this.state.accounts.me.loidCreated;
+
+  if (!loidCreated) {
+    return false;
+  }
+
+  const age = (new Date()) - (new Date(loidCreated));
+  if (age < minAge) { return false; }
+
+  return true;
 });
 
 export default flags;

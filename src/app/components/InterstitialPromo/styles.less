@@ -4,6 +4,7 @@
 
 .InterstitialPromo {
   @logo-size: 120px;
+  @rating-logo-size: 64px;
   width: 100%;
   height: 100vh;
   text-align: center;
@@ -80,7 +81,7 @@
   &__header {
     display: inline-block;
     box-sizing: border-box;
-    margin: 6 * @grid-size @grid-size;
+    margin: 6*@grid-size 3*@grid-size;
   }
 
   &__title {
@@ -101,13 +102,78 @@
     margin-bottom: 2 * @grid-size;
   }
 
+  &__bulletlist {
+    font-size: @font-size-h3;
+    line-height: 1.2;
+    ul {
+      text-align: left;
+      display: inline-block;
+      .themeify({
+        color: @red;
+      });
+
+      span {
+        font-size: @font-size-h4;
+        .themeify({
+          color: @black;
+        });
+      }
+    }
+  }
+
+  &__rating {
+    display: inline-block;
+    padding: @grid-size;
+    margin: @grid-size @grid-size*3;
+    width: calc(100% ~ '-' @grid-size*6);
+    border-style: solid;
+    border-width: 1px;
+    border-color: @grey-text;
+    border-radius: @grid-size / 2;
+    text-align: left;
+
+  }
+
+  &__rating_icon {
+    display: inline-block;
+    .SnooIcon {
+      height: @rating-logo-size;
+      width: @rating-logo-size;
+      // float: left;
+      border-radius: @grid-size / 2;
+      background-color: @orangered;
+      line-height: @rating-logo-size;
+      // text-align: center;
+      // font-size: 48px;
+      color: @white;
+    }
+  }
+
+  &__rating_right {
+    display: inline-block;
+    font-size: @font-size-h4;
+    text-align: left;
+    padding-left: 2*@grid-size;
+    padding-top: @grid-size;
+    vertical-align: top;
+  }
+
+  &__rating_stars {
+    font-size: @font-size-h3;
+  }
+
+  &__rating_text {
+    font-size: @font-size-base;
+  }
+
   &__button {
     display: inline-block;
     padding: 12px 20px;
     font-size: @font-size-h4;
     line-height: 1.5;
     text-align: center;
-    margin: @grid-size auto;
+    margin: @grid-size @grid-size*3;
+    width: calc(100% ~ '-' @grid-size*6);
     border-radius: 5px;
     text-transform: uppercase;
 
@@ -118,6 +184,13 @@
     &, &:visited, &:hover {
       text-decoration: none;
 
+      .themeify({
+        color: @theme-button-text-color;
+      });
+    }
+
+    .icon {
+      font-size: @font-size-h3;
       .themeify({
         color: @theme-button-text-color;
       });
