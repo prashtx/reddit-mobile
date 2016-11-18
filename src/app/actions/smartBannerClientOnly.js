@@ -1,18 +1,16 @@
-import branch from 'branch-sdk';
-
-import config from 'config';
+// import url from 'url';
 
 import { shouldShowBanner } from 'lib/smartBannerState';
 import { show } from 'app/actions/smartBanner';
 
-async function generateLink(payload) {
-  return new Promise((resolve, reject) => {
-    branch.link(payload, (err, link) => {
-      if (err) { return reject(err); }
-      resolve(link);
-    });
-  });
-}
+// function generateLink(payload) {
+//   return url.format({
+//     protocol: 'https',
+//     host: 'reddit.app.link',
+//     pathname: '/',
+//     query: payload,
+//   });
+// }
 
 // The branch-sdk module makes an assumption that it runs in a browser
 // environment, even just on load, so we cannot import it on the server. Right
@@ -22,52 +20,49 @@ async function generateLink(payload) {
 // action code, so we can confine branch-sdk to the client.
 export const checkAndSet = () => async (dispatch, getState) => {
   const state = getState();
-  const {
-    showBanner,
-    clickUrl,
-  } = shouldShowBanner(state);
-
-  const { me={} } = state.accounts;
-  const { loid, loidCreated } = me;
-
-  if (showBanner) {
-    if (clickUrl) {
-      dispatch(show(clickUrl));
-    } else {
-      branch.init(config.branchKey, (err, data) => {
-        // callback to handle err or data
-        window.referring_link = data.referring_link;
-        window.referring_data = data.data_parsed;
-      });
-
-      const basePayload = {
-        channel: 'mweb_branch',
-        feature: 'interstitial',
-        campaign: 'xpromo_interstitial',
-        // We can use this space to fill "tags" which will populate on the
-        // branch dashboard and allow you sort/parse data. Optional/not required.
-        // tags: [ 'tag1', 'tag2' ],
-      };
-
-      const baseData = {
-        // Pass in data you want to appear and pipe in the app,
-        // including user token or anything else!
-        '$og_redirect': window.location.href,
-        '$deeplink_path': window.location.href.split(window.location.host)[1],
-        mweb_loid: loid,
-        mweb_loid_created: loidCreated,
-        utm_source: 'mweb_branch',
-        utm_medium: 'interstitial',
-        utm_name: 'xpromo_interstitial',
-        mweb_user_id36: null,
-        mweb_user_name: null,
-      };
-
-      const links = await Promise.all([
-        generateLink({ ...basePayload, data: { ...baseData, utm_content: 'element_1' } }),
-        generateLink({ ...basePayload, data: { ...baseData, utm_content: 'element_2' } }),
-      ]);
-      dispatch(show(links));
-    }
+  // XXX
+  if (shouldShowBanner(state)) {
+    dispatch(show());
   }
+  // const {
+  //   showBanner,
+  //   clickUrl,
+  // } = shouldShowBanner(state);
+
+
+  // XXX
+  // const { me={} } = state.accounts;
+  // const { loid, loidCreated } = me;
+  // if (showBanner) {
+  //   if (clickUrl) {
+  //     dispatch(show(clickUrl));
+  //   } else {
+  //     const basePayload = {
+  //       channel: 'mweb_branch',
+  //       feature: 'interstitial',
+  //       campaign: 'xpromo_interstitial',
+  //       // We can use this space to fill "tags" which will populate on the
+  //       // branch dashboard and allow you sort/parse data. Optional/not required.
+  //       // tags: [ 'tag1', 'tag2' ],
+  //       // Pass in data you want to appear and pipe in the app,
+  //       // including user token or anything else!
+  //       '$og_redirect': window.location.href,
+  //       '$deeplink_path': window.location.href.split(window.location.host)[1],
+  //       mweb_loid: loid,
+  //       mweb_loid_created: loidCreated,
+  //       utm_source: 'mweb_branch',
+  //       utm_medium: 'interstitial',
+  //       utm_name: 'xpromo_interstitial',
+  //       mweb_user_id36: null,
+  //       mweb_user_name: null,
+  //     };
+
+  //     const links = [
+  //       generateLink({ ...basePayload, utm_content: 'element_1' }),
+  //       generateLink({ ...basePayload, utm_content: 'element_2' }),
+  //     ];
+
+  //     dispatch(show(links));
+  //   }
+  // }
 };

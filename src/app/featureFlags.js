@@ -29,8 +29,6 @@ const config = {
     allowedPages: [
       'index',
       'listing',
-      // XXX We were restricting the banner on comments pages to 5% of users. Should we disable it for now?
-      // 'comments',
     ],
   },
   [USE_BRANCH]: true,

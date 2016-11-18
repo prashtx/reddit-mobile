@@ -8,6 +8,7 @@ import { createStructuredSelector } from 'reselect';
 
 import { flags } from 'app/constants';
 import { getDevice } from 'lib/getDeviceFromState';
+import { getBranchLink } from 'lib/smartBannerState';
 
 import { featuresSelector} from 'app/selectors/features';
 import * as smartBannerActions from 'app/actions/smartBanner';
@@ -78,26 +79,28 @@ function InterstitialPromo(props) {
       />
       <div className='InterstitialPromo__icon'>
         <SnooIcon />
+        <div className='InterstitialPromo__wordmark'>
+          <Logo />
+        </div>
       </div>
-      <div className='InterstitialPromo__wordmark'>
-        <Logo />
+      <div className='InterstitialPromo__bottom'>
+        <div className='InterstitialPromo__header'>
+          <div className='InterstitialPromo__title'>{ TITLE }</div>
+          <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
+          { features.enabled(VARIANT_XPROMO_LIST) ? <List /> : null }
+        </div>
+        <a
+          className='InterstitialPromo__button'
+          href={ urls[0] }
+        >
+          { CTA }
+          <span className="icon icon-play"></span>
+        </a>
+        <div className='InterstitialPromo__dismissal'>
+          or go to the <a onClick={ onClose }>mobile site</a>
+        </div>
+        { features.enabled(VARIANT_XPROMO_RATING) ? <Rating device={ device }/> : null }
       </div>
-      <div className='InterstitialPromo__header'>
-        <div className='InterstitialPromo__title'>{ TITLE }</div>
-        <div className='InterstitialPromo__subtitle'>{ SUBTITLE }</div>
-        { features.enabled(VARIANT_XPROMO_LIST) ? <List /> : null }
-      </div>
-      <a
-        className='InterstitialPromo__button'
-        href={ urls[0] }
-      >
-        { CTA }
-        <span className="icon icon-play"></span>
-      </a>
-      <div className='InterstitialPromo__dismissal'>
-        or go to the <a onClick={ onClose }>mobile site</a>
-      </div>
-      { features.enabled(VARIANT_XPROMO_RATING) ? <Rating device={ device }/> : null }
     </div>
   );
 }
@@ -108,7 +111,22 @@ InterstitialPromo.propTypes = {
 };
 
 const selector = createStructuredSelector({
-  urls: state => state.smartBanner.deepLinks,
+  urls: state => [
+    getBranchLink(state, {
+      feature: 'interstitial',
+      campaign: 'xpromo_interstitial',
+      utm_medium: 'interstitial',
+      utm_name: 'xpromo_interstitial',
+      utm_content: 'element_1',
+    }),
+    getBranchLink(state, {
+      feature: 'interstitial',
+      campaign: 'xpromo_interstitial',
+      utm_medium: 'interstitial',
+      utm_name: 'xpromo_interstitial',
+      utm_content: 'element_2',
+    }),
+  ],
   features: featuresSelector,
   device: getDevice,
 });

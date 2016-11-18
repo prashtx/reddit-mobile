@@ -1,12 +1,7 @@
 import { markBannerClosed } from 'lib/smartBannerState';
 
 export const SHOW = 'SMARTBANNER__SHOW';
-export const show = deepLinks => ({
-  type: SHOW,
-  data: {
-    deepLinks,
-  },
-});
+export const show = () => ({ type: SHOW });
 
 export const HIDE = 'SMARTBANNER__HIDE';
 export const hide = () => ({ type: HIDE });

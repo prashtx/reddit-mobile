@@ -1,3 +1,5 @@
+import url from 'url';
+
 import localStorageAvailable from './localStorageAvailable';
 import { getDevice, IOS_DEVICES, ANDROID } from 'lib/getDeviceFromState';
 import * as constants from 'app/constants';
@@ -12,12 +14,63 @@ const TWO_WEEKS = 2 * 7 * 24 * 60 * 60 * 1000;
 
 const ALLOWED_DEVICES = IOS_DEVICES.concat(ANDROID);
 
-// XXX
-// const PAGE_PERCENTAGES = {
-//   'comments': 5,
-// };
-
 const { USE_BRANCH } = constants.flags;
+
+export function getBranchLink(state, payload={}) {
+  const { me={} } = state.accounts;
+  const { loid, loidCreated } = me;
+
+  const basePayload = {
+    channel: 'mweb_branch',
+    feature: 'smartbanner',
+    campaign: 'xpromo_banner',
+    // We can use this space to fill "tags" which will populate on the
+    // branch dashboard and allow you sort/parse data. Optional/not required.
+    // tags: [ 'tag1', 'tag2' ],
+    // Pass in data you want to appear and pipe in the app,
+    // including user token or anything else!
+    '$og_redirect': window.location.href,
+    '$deeplink_path': window.location.href.split(window.location.host)[1],
+    mweb_loid: loid,
+    mweb_loid_created: loidCreated,
+    utm_source: 'mweb_branch',
+    utm_medium: 'smartbanner',
+    utm_name: 'xpromo_banner',
+    mweb_user_id36: null,
+    mweb_user_name: null,
+  };
+
+  return url.format({
+    protocol: 'https',
+    host: 'reddit.app.link',
+    pathname: '/',
+    query: {...basePayload, ...payload},
+  });
+}
+
+export function getDeepLink(state) {
+  const device = getDevice(state);
+  if (!ALLOWED_DEVICES.includes(device)) {
+    return null;
+  }
+
+  // See if we should use a Branch link
+  const feature = features.withContext({ state });
+  if (feature && feature.enabled(USE_BRANCH)) {
+    // just use the universal Branch link
+    return getBranchLink(state);
+  }
+
+  // Otherwise use a basic deep link
+
+  if (IOS_DEVICES.includes(device)) {
+    return constants.BANNER_URLS_DIRECT.IOS;
+  }
+
+  if (device === ANDROID) {
+    return constants.BANNER_URLS_DIRECT.ANDROID;
+  }
+}
 
 export function shouldShowBanner(state) {
   // Lots of options we have to consider.
@@ -29,59 +82,17 @@ export function shouldShowBanner(state) {
   const lastClosed = lastClosedStr ? new Date(lastClosedStr).getTime() : 0;
   const lastClosedLimit = lastClosed + TWO_WEEKS;
   if (lastClosedLimit > Date.now()) {
-    return BASE_VAL;
+    return false;
   }
 
   const device = getDevice(state);
 
   // 3) Check the user agent
-  if (!ALLOWED_DEVICES.includes(device)) { return BASE_VAL; }
-
-  // XXX Lean on the featureFlags component for the bucketing, so we can in turn rely on r2.
-  // // Create a bucket; a few rules are going to depend on that
-  // let userId = '';
-  // if (user) { userId = user.loid || user.id; }
-  // const userIdSum = userId.split('').reduce((sum, chr) => sum + chr.charCodeAt(0), 0);
-  // const bucket = userIdSum % 100;
-
-  // // 5) only show to a certain % of users that land on a given page
-  // for (const pageName in PAGE_PERCENTAGES) {
-  //   if ((actionName === pageName) && (bucket > PAGE_PERCENTAGES[pageName])) {
-  //     return BASE_VAL;
-  //   }
-  // }
-
-  // Ok, now we know we're actually going to show the banner. Next, we need to
-  // determine what urls we're going to use
-  // A) Use Branch link
-  const feature = features.withContext({ state });
-  if (feature && feature.enabled(USE_BRANCH)) {
-    // just use the universal Branch link
-    return {
-      ...BASE_VAL,
-      showBanner: true,
-    };
+  if (!ALLOWED_DEVICES.includes(device)) {
+    return false;
   }
 
-  // B) Use direct link. have to determine device type
-  if (IOS_DEVICES.includes(device)) {
-    return {
-      ...BASE_VAL,
-      showBanner: true,
-      deepLinks: [constants.BANNER_URLS_DIRECT.IOS],
-    };
-  }
-
-  if (device === ANDROID) {
-    return {
-      ...BASE_VAL,
-      showBanner: true,
-      deepLinks: [constants.BANNER_URLS_DIRECT.ANDROID],
-    };
-  }
-
-  // C) don't have that device listed. infamous 'this should never happen' here.
-  return BASE_VAL;
+  return true;
 }
 
 export function markBannerClosed() {

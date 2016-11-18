@@ -3,7 +3,8 @@
 @import (reference) '~app/less/themes/themeify';
 
 .InterstitialPromo {
-  @logo-size: 120px;
+  @logo-size: 80px;
+  @wordmark-size: 36px;
   @rating-logo-size: 64px;
   width: 100%;
   height: 100vh;
@@ -14,15 +15,10 @@
     fill: @black;
   });
 
-  // XXX night mode?
-  // .themeify({
-  //   background-color: @theme-nav-bar-color;
-  // });
-
   .themeify({
     background-image: linear-gradient(to bottom, rgba(255,255,255,0), @white), url(/img/white-pattern.jpg);
     background-repeat: no-repeat, no-repeat;
-    background-size: cover, auto 75%;
+    background-size: 100% 75%, auto 75%;
     background: -webkit-linear-gradient(top, rgba(255,255,255,0), @white), -moz-linear-gradient(top, rgba(255,255,255,0), @white), -o-linear-gradient(top, rgba(255,255,255,0), @white), linear-gradient(to bottom, rgba(255,255,255,0), @white);
     background-color: @white;
   });
@@ -35,7 +31,6 @@
     vertical-align: middle;
     padding: @grid-size @half-grid-size;
     .themeify({
-      // XXX night mode?
       color: @grey-text;
     });
     font-size: @font-size-h2;
@@ -53,7 +48,8 @@
     // height: @logo-size;
     // margin-left: auto;
     // margin-right: auto;
-    margin-top: @logo-size / 2;
+    // margin-top: @logo-size / 2;
+    margin-top: 10vh;
     margin-bottom: @grid-size;
     
 
@@ -70,12 +66,22 @@
     }
   }
   &__wordmark {
-    margin-top: @grid-size;
-    margin-bottom: @grid-size;
+    display: inline-block;
+    margin: (@logo-size - @wordmark-size) / 2 (2 * @grid-size);
     .Logo {
-      height: @font-size-h1;
+      height: @wordmark-size;
       width: auto;
     }
+  }
+
+  &__bottom {
+    position: absolute;
+    bottom: 6*@grid-size;
+    left: 0;
+    left: 50%;
+    width: 320px;
+    transform: translate(-50%, 0);
+    // padding-bottom: 6*@grid-size;
   }
 
   &__header {
@@ -86,7 +92,7 @@
 
   &__title {
     margin-bottom: 2px;
-    font-size: @font-size-h1;
+    font-size: @font-size-h2;
     font-weight: bold;
     line-height: 1.2;
 
@@ -100,6 +106,7 @@
     line-height: 1.2;
     margin-top: 2 * @grid-size;
     margin-bottom: 2 * @grid-size;
+    max-width: 320px;
   }
 
   &__bulletlist {
@@ -124,13 +131,18 @@
   &__rating {
     display: inline-block;
     padding: @grid-size;
-    margin: @grid-size @grid-size*3;
+    // margin: @grid-size*6 @grid-size*3 @grid-size @grid-size*3;
+    margin: @grid-size @grid-size*3 0 @grid-size*3;
     width: calc(100% ~ '-' @grid-size*6);
+    max-width: 320px;
     border-style: solid;
     border-width: 1px;
     border-color: @grey-text;
     border-radius: @grid-size / 2;
     text-align: left;
+    // position: absolute;
+    // bottom: 3 * @grid-size;
+    // left: 0;
 
   }
 
@@ -174,6 +186,7 @@
     text-align: center;
     margin: @grid-size @grid-size*3;
     width: calc(100% ~ '-' @grid-size*6);
+    max-width: 320px;
     border-radius: 5px;
     text-transform: uppercase;
 
