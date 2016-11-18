@@ -17,9 +17,11 @@
 
   .themeify({
     background-image: linear-gradient(to bottom, rgba(255,255,255,0), @white), url(/img/white-pattern.jpg);
+    background-image: -webkit-linear-gradient(to bottom, rgba(255,255,255,0), @white), url(/img/white-pattern.jpg);
+    background-image: -moz-linear-gradient(to bottom, rgba(255,255,255,0), @white), url(/img/white-pattern.jpg);
+    background-image: -o-linear-gradient(to bottom, rgba(255,255,255,0), @white), url(/img/white-pattern.jpg);
     background-repeat: no-repeat, no-repeat;
     background-size: 100% 75%, auto 75%;
-    background: -webkit-linear-gradient(top, rgba(255,255,255,0), @white), -moz-linear-gradient(top, rgba(255,255,255,0), @white), -o-linear-gradient(top, rgba(255,255,255,0), @white), linear-gradient(to bottom, rgba(255,255,255,0), @white);
     background-color: @white;
   });
 
@@ -77,9 +79,10 @@
   &__bottom {
     position: absolute;
     bottom: 6*@grid-size;
-    left: 0;
+    // left: 0;
     left: 50%;
-    width: 320px;
+    max-width: 320px;
+    width: 100%;
     transform: translate(-50%, 0);
     // padding-bottom: 6*@grid-size;
   }
@@ -87,7 +90,7 @@
   &__header {
     display: inline-block;
     box-sizing: border-box;
-    margin: 6*@grid-size 3*@grid-size;
+    margin: 6*@grid-size 3*@grid-size 3*@grid-size 3*@grid-size;
   }
 
   &__title {
@@ -129,10 +132,14 @@
   }
 
   &__rating {
+    .themeify({
+      color: @black;
+      fill: @black;
+    });
     display: inline-block;
     padding: @grid-size;
     // margin: @grid-size*6 @grid-size*3 @grid-size @grid-size*3;
-    margin: @grid-size @grid-size*3 0 @grid-size*3;
+    margin: 2*@grid-size 3*@grid-size 0 3*@grid-size;
     width: calc(100% ~ '-' @grid-size*6);
     max-width: 320px;
     border-style: solid;

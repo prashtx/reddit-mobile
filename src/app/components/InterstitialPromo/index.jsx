@@ -42,29 +42,31 @@ function List() {
 }
 
 function Rating(props) {
-  const { device } = props;
+  const { device, url } = props;
 
   return (
-    <div className='InterstitialPromo__rating'>
-      <div className='InterstitialPromo__rating_icon'>
-        <SnooIcon />
+    <a href={ url }>
+      <div className='InterstitialPromo__rating'>
+        <div className='InterstitialPromo__rating_icon'>
+          <SnooIcon />
+        </div>
+        <div className='InterstitialPromo__rating_right'>
+          <div className='InterstitialPromo__rating_title'>
+            Reddit for { device }
+          </div>
+          <div className='InterstitialPromo__rating_stars'>
+            <span className='icon icon-gold'></span>
+            <span className='icon icon-gold'></span>
+            <span className='icon icon-gold'></span>
+            <span className='icon icon-gold'></span>
+            <span className='icon icon-gold'></span>
+          </div>
+          <div className='InterstitialPromo__rating_text'>
+            5,000+ 5-star reviews
+          </div>
+        </div>
       </div>
-      <div className='InterstitialPromo__rating_right'>
-        <div className='InterstitialPromo__rating_title'>
-          Reddit for { device }
-        </div>
-        <div className='InterstitialPromo__rating_stars'>
-          <span className='icon icon-gold'></span>
-          <span className='icon icon-gold'></span>
-          <span className='icon icon-gold'></span>
-          <span className='icon icon-gold'></span>
-          <span className='icon icon-gold'></span>
-        </div>
-        <div className='InterstitialPromo__rating_text'>
-          5,000+ 5-star reviews
-        </div>
-      </div>
-    </div>
+    </a>
   );
 }
 
@@ -99,7 +101,8 @@ function InterstitialPromo(props) {
         <div className='InterstitialPromo__dismissal'>
           or go to the <a onClick={ onClose }>mobile site</a>
         </div>
-        { features.enabled(VARIANT_XPROMO_RATING) ? <Rating device={ device }/> : null }
+        { features.enabled(VARIANT_XPROMO_RATING) ?
+            <Rating device={ device} url={ urls[1] }/> : null }
       </div>
     </div>
   );
