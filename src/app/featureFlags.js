@@ -292,4 +292,9 @@ flags.addRule('allowedDevices', function (allowed) {
   return (!!device) && allowed.includes(device);
 });
 
+flags.addRule('notOptedOut', function (flag) {
+  const optedOut = this.state.optOuts[flag];
+  return !optedOut;
+});
+
 export default flags;

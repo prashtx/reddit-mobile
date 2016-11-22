@@ -64,6 +64,8 @@ export const VISITED_POSTS_COUNT = 20;
 
 export const RECENT_CLICKS_LENGTH = 5;
 
+export const XPROMO_LISTING_OPT_OUT = 'no_xpromo_listing_interstitial';
+
 // Post content
 
 export const POST_COMPACT_THUMBNAIL_WIDTH = 70;
