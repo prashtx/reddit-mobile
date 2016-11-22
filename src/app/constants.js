@@ -64,7 +64,7 @@ export const VISITED_POSTS_COUNT = 20;
 
 export const RECENT_CLICKS_LENGTH = 5;
 
-export const XPROMO_LISTING_OPT_OUT = 'no_xpromo_listing_interstitial';
+export const XPROMO_INTERSTITIAL_OPT_OUT = 'no_xpromo_interstitial';
 
 // Post content
 
