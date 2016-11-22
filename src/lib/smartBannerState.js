@@ -1,4 +1,5 @@
 import url from 'url';
+import cookies from 'js-cookie';
 
 import localStorageAvailable from './localStorageAvailable';
 import { getDevice, IOS_DEVICES, ANDROID } from 'lib/getDeviceFromState';
@@ -9,11 +10,28 @@ const TWO_WEEKS = 2 * 7 * 24 * 60 * 60 * 1000;
 
 const { USE_BRANCH } = constants.flags;
 
+// Get loid values either from the account state or the cookies.
+function getLoidValues(accounts) {
+  if (accounts.me) {
+    return {
+      loid: accounts.me.loid,
+      loidCreated: accounts.me.loidCreated,
+    };
+  }
+
+  const loid = cookies.get('loid');
+  const loidCreated = cookies.get('loidcreated');
+
+  return {
+    loid,
+    loidCreated,
+  };
+}
+
 export function getBranchLink(state, payload={}) {
   const { user, accounts } = state;
 
-  const { me={} } = accounts;
-  const { loid, loidCreated } = me;
+  const { loid, loidCreated } = getLoidValues(accounts);
 
   let userName;
   let userId;
