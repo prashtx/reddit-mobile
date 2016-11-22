@@ -1,4 +1,4 @@
-import { merge } from '@r/platform';
+import merge from '@r/platform/merge';
 import * as platformActions from '@r/platform/actions';
 
 import { XPROMO_INTERSTITIAL_OPT_OUT } from 'app/constants';
