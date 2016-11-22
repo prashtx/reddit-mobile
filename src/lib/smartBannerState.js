@@ -10,8 +10,19 @@ const TWO_WEEKS = 2 * 7 * 24 * 60 * 60 * 1000;
 const { USE_BRANCH } = constants.flags;
 
 export function getBranchLink(state, payload={}) {
-  const { me={} } = state.accounts;
+  const { user, accounts } = state;
+
+  const { me={} } = accounts;
   const { loid, loidCreated } = me;
+
+  let userName;
+  let userId;
+
+  const userAccount = user.loggedOut ? null : accounts[user.name];
+  if (userAccount) {
+    userName = userAccount.name;
+    userId = userAccount.id;
+  }
 
   const basePayload = {
     channel: 'mweb_branch',
@@ -29,11 +40,8 @@ export function getBranchLink(state, payload={}) {
     utm_source: 'mweb_branch',
     utm_medium: 'smartbanner',
     utm_name: 'xpromo_banner',
-    // We currently only pass along data for logged-out users, but we will
-    // populate these fields if we build and test cross-promotion experiences
-    // for logged-in users.
-    mweb_user_id36: null,
-    mweb_user_name: null,
+    mweb_user_id36: userId,
+    mweb_user_name: userName,
   };
 
   return url.format({
