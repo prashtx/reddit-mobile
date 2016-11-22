@@ -16,6 +16,7 @@ import {
 export function InterstitialModal(props) {
   return (
     <div className='InterstitialListing'>
+      <div className='InterstitialListing__modalCover' />
       <div className='InterstitialListing__modal'>
         <div className='InterstitialListing__modalcontent'>
           <InterstitialListingCommon { ... props } />
