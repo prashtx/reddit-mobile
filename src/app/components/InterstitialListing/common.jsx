@@ -23,12 +23,19 @@ const {
 
 function List() {
   return (
-    <div className='InterstitialListing__bulletlist'>
-      <ul>
-        <li><span>50% Faster</span></li>
-        <li><span>Infinite Scroll</span></li>
-        <li><span>Autoplay GIFs</span></li>
-      </ul>
+    <div className='InterstitialListing__bulletList'>
+      <div className='InterstitialListing__bulletItem'>
+        <span className='InterstitialListing__bulletIcon icon icon-controversial' />
+        50% Faster
+      </div>
+      <div className='InterstitialListing__bulletItem'>
+        <span className='InterstitialListing__bulletIcon icon icon-compact' />
+        Infinite Scroll
+      </div>
+      <div className='InterstitialListing__bulletItem'>
+        <span className='InterstitialListing__bulletIcon icon icon-play_triangle' />
+        Autoplay GIFs
+      </div>
     </div>
   );
 }
@@ -52,21 +59,11 @@ export function InterstitialListingCommon(props) {
 
   return (
     <div className='InterstitialListing__common'>
-      <div
-        className='InterstitialListing__close icon icon-x'
-        onClick={ onClose }
-      />
-      <div className='InterstitialListing__icon'>
-        <SnooIcon />
-        <div className='InterstitialListing__wordmark'>
-          <Logo />
-        </div>
+      <div className='InterstitialListing__header'>
+        { renderImageContent(thumbnails) }
       </div>
       <div className='InterstitialListing__bottom'>
-        <div className='InterstitialListing__header'>
-          { thumbnails ? thumbnails.map(tn =>
-              <img className='InterstitialListing__thumbnail' src={ tn } />
-            ) : null }
+        <div className='InterstitialListing__bottomContent'>
           <div className='InterstitialListing__title'>
             { titleText }
           </div>
@@ -74,21 +71,49 @@ export function InterstitialListingCommon(props) {
             { subtitleText }
           </div>
           <List />
-        </div>
-        <div
-          className='InterstitialListing__button'
-          onClick={ navigator(urls[0]) }
-        >
-          { buttonText }
-          <span className="icon icon-play"></span>
-        </div>
-        <div className='InterstitialListing__dismissal'>
-          or go to the <a onClick={ onClose }>mobile site</a>
+          <div
+            className='InterstitialListing__button'
+            onClick={ navigator(urls[0]) }
+          >
+            { buttonText }
+          </div>
+          <div className='InterstitialListing__dismissal'>
+            or go to the <a onClick={ onClose }>mobile site</a>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+const renderImageContent = thumbnails => {
+  if (thumbnails) {
+    return (
+      <div className='InterstitialListing__thumbnailGrid'>
+        { thumbnails.map(tn =>
+          <div className='InterstitialListing__thumbnailWrapper' key={ tn }>
+            <div
+              className='InterstitialListing__thumbnail'
+              style={ { backgroundImage: `url(${tn})` }}
+            />
+          </div>
+        ) }
+      </div>
+    );
+  }
+
+  // explicitly null means we don't have thumbnails
+  // only render the image in this case to prevent pop-in
+  if (thumbnails === null) {
+    return (
+      <div className='InterstitialListing__appPreview'>
+        <div className='InterstitialListing__appPreviewImage' />
+      </div>
+    );
+  }
+
+  return <div className='InterstitialListing__headerPlaceholder' />;
+};
 
 InterstitialListingCommon.propTypes = {
   urls: T.array.isRequired,
