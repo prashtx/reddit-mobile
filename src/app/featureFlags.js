@@ -86,9 +86,7 @@ const config = {
   },
   [VARIANT_XPROMO_BASE]: {
     and: [
-      { loggedin: false },
-      { minLoidAge: 24 * 60 * 60 * 1000 }, // 1 day in ms
-      { directVisit: true },
+      { notOptedOut: 'xpromoInterstitial' },
       { allowedPages: ['index'] },
       { or: [
         { and: [
@@ -108,9 +106,7 @@ const config = {
   },
   [VARIANT_XPROMO_LIST]: {
     and: [
-      { loggedin: false },
-      { minLoidAge: 24 * 60 * 60 * 1000 }, // 1 day in ms
-      { directVisit: true },
+      { notOptedOut: 'xpromoInterstitial' },
       { allowedPages: ['index'] },
       { or: [
         { and: [
@@ -130,9 +126,7 @@ const config = {
   },
   [VARIANT_XPROMO_RATING]: {
     and: [
-      { loggedin: false },
-      { minLoidAge: 24 * 60 * 60 * 1000 }, // 1 day in ms
-      { directVisit: true },
+      { notOptedOut: 'xpromoInterstitial' },
       { allowedPages: ['index'] },
       { or: [
         { and: [
@@ -152,17 +146,18 @@ const config = {
   },
   [VARIANT_XPROMO_LISTING]: {
     and: [
+      { notOptedOut: 'xpromoInterstitial' },
       { allowedPages: ['listing'] },
       { or: [
         { and: [
           { allowedDevices: [ANDROID] },
-          { variant: 'mweb_xpromo_interstitial_android:listing',
+          { variant: 'mweb_xpromo_interstitial_listing_android:listing',
             url: 'xpromolisting',
           },
         ] },
         { and: [
           { allowedDevices: IOS_DEVICES },
-          { variant: 'mweb_xpromo_interstitial_ios:listing',
+          { variant: 'mweb_xpromo_interstitial_listing_ios:listing',
             url: 'xpromolisting',
           },
         ] },
@@ -171,17 +166,18 @@ const config = {
   },
   [VARIANT_XPROMO_SUBREDDIT]: {
     and: [
+      { notOptedOut: 'xpromoInterstitial' },
       { allowedPages: ['listing'] },
       { or: [
         { and: [
           { allowedDevices: [ANDROID] },
-          { variant: 'mweb_xpromo_interstitial_android:subreddit',
+          { variant: 'mweb_xpromo_interstitial_listing_android:subreddit',
             url: 'xpromosubreddit',
           },
         ] },
         { and: [
           { allowedDevices: IOS_DEVICES },
-          { variant: 'mweb_xpromo_interstitial_ios:subreddit',
+          { variant: 'mweb_xpromo_interstitial_listing_ios:subreddit',
             url: 'xpromosubreddit',
           },
         ] },
@@ -190,17 +186,18 @@ const config = {
   },
   [VARIANT_XPROMO_CLICK]: {
     and: [
+      { notOptedOut: 'xpromoInterstitial' },
       { allowedPages: ['listing'] },
       { or: [
         { and: [
           { allowedDevices: [ANDROID] },
-          { variant: 'mweb_xpromo_interstitial_android:click',
+          { variant: 'mweb_xpromo_interstitial_listing_android:click',
             url: 'xpromoclick',
           },
         ] },
         { and: [
           { allowedDevices: IOS_DEVICES },
-          { variant: 'mweb_xpromo_interstitial_ios:click',
+          { variant: 'mweb_xpromo_interstitial_listing_ios:click',
             url: 'xpromoclick',
           },
         ] },
