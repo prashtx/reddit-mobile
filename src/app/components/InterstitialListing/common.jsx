@@ -37,19 +37,17 @@ export function InterstitialListingCommon(props) {
    * it breaks otherwise when we navigate off a listing page.
    */
   const { urls, onClose, features, subreddit, thumbnails, navigator } = props;
-  const entity = features.enabled(VARIANT_XPROMO_SUBREDDIT)
-    ? `r/${ subreddit}`
-    : 'Reddit';
 
   const titleText = features.enabled(VARIANT_XPROMO_SUBREDDIT)
-    ? 'Just a tap away'
+    ? ''
+    : 'View this post in the official Reddit app';
+
+  const subtitleText = features.enabled(VARIANT_XPROMO_SUBREDDIT)
+    ? `r/${ subreddit } is better with the app. We hate to intrude, ` +
+      'but you deserve the best.'
     : '';
 
-  const buttonText = features.enabled(VARIANT_XPROMO_SUBREDDIT)
-    ? 'Tap to get Reddit'
-    : 'Continue';
-
-  const showList = !features.enabled(VARIANT_XPROMO_SUBREDDIT);
+  const buttonText = 'Continue';
 
   return (
     <div className='InterstitialListing__common'>
@@ -72,10 +70,9 @@ export function InterstitialListingCommon(props) {
             { titleText }
           </div>
           <div className='InterstitialListing__subtitle'>
-            { entity } is better with the app.
-            We&nbsp;hate to intrude, but&nbsp;you&nbsp;deserve&nbsp;the&nbsp;best.
+            { subtitleText }
           </div>
-          { showList ? <List /> : null }
+          <List />
         </div>
         <div
           className='InterstitialListing__button'
