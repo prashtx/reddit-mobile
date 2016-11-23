@@ -124,11 +124,13 @@ export const selector = createSelector(
   (urls, features, device, subredditName, subreddits, postsLists, posts) => {
     let subreddit = subredditName;
     let thumbnails;
+    let over18 = false;
 
     // Show the subreddit's displayName if possible
     const subredditInfo = subreddits[subredditName.toLowerCase()];
     if (subredditInfo) {
       subreddit = subredditInfo.displayName;
+      over18 = subredditInfo.over18;
     }
 
     // For subreddit listings, we use the listing data we're already
@@ -137,8 +139,10 @@ export const selector = createSelector(
     const postsList = postsLists[hash];
     if (postsList && !postsList.loading) {
       const uuids = postsList.results.map(item => item.uuid);
-      const allThumbs = uuids.map(item => posts[item].thumbnail)
-                             .filter(item => !!item);
+      const allThumbs = uuids
+        .filter(item => over18 || !posts[item].over18)
+        .map(item => posts[item].thumbnail)
+        .filter(item => !!item);
       if (allThumbs.length >= 9) {
         thumbnails = allThumbs.slice(0, 9);
       } else {
