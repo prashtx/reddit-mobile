@@ -75,7 +75,6 @@ function trackCrawlEvent(state, additionalEventData) {
   const { protocol, method, crawler, userAgent, domain } = state.meta;
 
   const payload = {
-    params_app: 'mweb',
     http_response_code: state.platform.currentPage.status,
     // (skrisman | 10.17.2016) consider how we can get a response_time here
     // (skrisman | 10.17.2016) is there a concept like "server" that we have?
