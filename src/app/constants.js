@@ -111,3 +111,9 @@ export const themes = {
 };
 
 export const LOGGEDOUT_REDIRECT = '/register';
+
+export const loginErrors = {
+  WRONG_PASSWORD: 'WRONG_PASSWORD',
+  BAD_USERNAME: 'BAD_USERNAME',
+  INCORRECT_USERNAME_PASSWORD: 'INCORRECT_USERNAME_PASSWORD',
+};
