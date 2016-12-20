@@ -4,7 +4,7 @@ import { PrivateAPI } from '@r/private';
 import { logServerError } from 'lib/errorLog';
 import proxiedApiOptions from 'lib/proxiedApiOptions';
 
-import { loginErrors } from 'app/constants';
+import { loginErrors, genericErrors } from 'app/constants';
 
 
 export default (router, apiOptions) => {
@@ -29,7 +29,7 @@ export default (router, apiOptions) => {
       } else {
         // If we don't know the error type, we still want to convey to the
         // client that an error occurred.
-        ctx.body = { error: 'UNKNOWN_ERROR' };
+        ctx.body = { error: genericErrors.UNKNOWN_ERROR };
         logServerError(error, ctx);
       }
     }

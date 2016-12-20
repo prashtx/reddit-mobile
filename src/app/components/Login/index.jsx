@@ -6,7 +6,7 @@ import { createSelector } from 'reselect';
 import { METHODS } from '@r/platform/router';
 import { Form, Anchor, BackAnchor } from '@r/platform/components';
 
-import { loginErrors } from 'app/constants';
+import { loginErrors, genericErrors } from 'app/constants';
 
 import * as sessionActions from 'app/actions/session';
 
@@ -86,17 +86,27 @@ class Login extends React.Component {
 
     const error = { username: '', password: '' };
 
-    if (errorType === loginErrors.WRONG_PASSWORD) {
-      error.password = 'Sorry, that’s not the right password';
-    } else if (errorType === loginErrors.BAD_USERNAME) {
-      error.username = 'Sorry, that’s not a valid username';
-    } else if (errorType === loginErrors.INCORRECT_USERNAME_PASSWORD) {
-      // Use a zero-width space, so we have something truthy to trigger the
-      // clear-username button without having to show two messages.
-      error.username = '\u200B';
-      error.password = 'Sorry, that’s an incorrect username or password';
-    } else if (errorType) {
-      error.password = 'Sorry, we were unable to log you in';
+    switch (errorType) {
+      case loginErrors.WRONG_PASSWORD: {
+        error.password = 'Sorry, that’s not the right password';
+        break;
+      }
+
+      case loginErrors.BAD_USERNAME: {
+        error.username = 'Sorry, that’s not a valid username';
+        break;
+      }
+
+      case loginErrors.INCORRECT_USERNAME_PASSWORD: {
+        error.username = true;
+        error.password = 'Sorry, that’s an incorrect username or password';
+        break;
+      }
+
+      case genericErrors.UNKNOWN_ERROR: {
+        error.password = 'Sorry, we were unable to log you in';
+        break;
+      }
     }
 
     return (

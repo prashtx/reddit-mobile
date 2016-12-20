@@ -117,3 +117,7 @@ export const loginErrors = {
   BAD_USERNAME: 'BAD_USERNAME',
   INCORRECT_USERNAME_PASSWORD: 'INCORRECT_USERNAME_PASSWORD',
 };
+
+export const genericErrors = {
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+};
