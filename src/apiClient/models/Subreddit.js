@@ -111,6 +111,7 @@ export default class Subreddit extends RedditModel {
     icon_img: 'iconImage',
     icon_size: 'iconSize',
     key_color: 'keyColor',
+    over_18: 'over18',
     public_description: 'publicDescription',
     public_traffic: 'publicTraffic',
     related_subreddits: 'relatedSubreddits',
