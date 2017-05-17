@@ -373,13 +373,7 @@ const config = {
       ] },
     ],
   },
-  [SHOW_AMP_LINK]: {
-    url: 'showamplink',
-    pageBucketPercent: {
-      seed: 'showamplink',
-      percentage: 2,
-    },
-  },
+  [SHOW_AMP_LINK]: true,
   [VARIANT_DEFAULT_SRS_TUTORIAL]: {
     url: 'experimentdefaultsrstutorial',
     and: [{
